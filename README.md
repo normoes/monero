@@ -1,5 +1,7 @@
 
 For running `monerod`, `monero-wallet-rpc` or `monero-wallet-cli` in docker containers.
+This daemon is explictitely made for `mainnet` and `stagenet`. 
+A `testnet` daemon will follow.
 
 **Hint**:
 The IPs, the daemon or RPC are binding to, need to be `0.0.0.0` instead of `127.0.0.1`.
