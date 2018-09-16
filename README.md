@@ -1,6 +1,11 @@
 
 For running `monerod`, `monero-wallet-rpc` or `monero-wallet-cli` in docker containers.
+
 This daemon is explictitely made for `mainnet` and `stagenet`. 
+
+It runs monero `0.12.3.0`, `x64` and the docker image is based on   ubuntu:16.04  .
+
+
 A `testnet` daemon will follow.
 
 **Hint**:
