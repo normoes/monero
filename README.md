@@ -52,7 +52,7 @@ docker run --rm -it -v <path_tp_wallet>:/monero --net host normoes/monero-daemon
 
 `monero-wallet-rpc` starts with the above default configuration plus additional options passed in the actual docker run command.
 
-To secure `moenro-wallet-rpc` replace `--disable-rpc-login` by `rpc-login user:password`. Any JSON RPC request should then be provided with user credentials like this:
+To secure `monero-wallet-rpc` replace `--disable-rpc-login` by `rpc-login user:password`. Any JSON RPC request should then be provided with user credentials like this:
 
 ```bash
     curl -u user:password --digest http://localhost:18083
