@@ -1,4 +1,5 @@
-# monero docker image
+
+For running `monerod`, `monero-wallet-rpc` or `monero-wallet-cli`.
 
 ## Default configuration
 
