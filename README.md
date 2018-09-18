@@ -1,5 +1,5 @@
 
-For running `monerod`, `monero-wallet-rpc` in a docker container.
+For running `monerod` or `monero-wallet-rpc` in a docker container.
 
 This daemon is explictitely made for `mainnet` and `stagenet`.
 

@@ -30,16 +30,12 @@ COPY --from=build /data /data
 COPY entrypoint.sh /entrypoint.sh
 
 # libpcsclite1 as dependency for monero since 0.12.0.0/0.12.2.0
-# add a non-root user, with /data as home directory
 RUN apt-get update && apt-get install -y libpcsclite1 \
   && apt-get autoremove --purge -y \
   && rm -rf /var/tmp/* /tmp/* /var/lib/apt/lists/* \
-  # && groupadd -r -g 1000 monero \
   && adduser --system --group --uid 1000 --no-create-home --shell /bin/false monero \
-  # && useradd --uid 500 --gid 500 -d /data -s /bin/bash -p '*' monero \
   && chmod +x /entrypoint.sh \
   && mv /data/* /usr/local/bin/ \
-  # && chown -R monero /data
   && rm -rf /data
 
 # switch user
