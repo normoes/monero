@@ -16,8 +16,6 @@ RUN curl https://downloads.getmonero.org/cli/monero-linux-$ARCH_TYPE-v$MONERO_VE
   && rm monero-linux-$ARCH_TYPE-v$MONERO_VERSION.tar.bz2 \
   && cp ./monero-v$MONERO_VERSION/monerod . \
   && chmod +x monerod \
-  && cp ./monero-v$MONERO_VERSION/monero-wallet-cli . \
-  && chmod +x monero-wallet-cli \
   && cp ./monero-v$MONERO_VERSION/monero-wallet-rpc . \
   && chmod +x monero-wallet-rpc \
   && rm -r monero-v$MONERO_VERSION \
