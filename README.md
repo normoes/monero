@@ -14,14 +14,14 @@ The IPs, the daemon or RPC are binding to, need to be `0.0.0.0` instead of `127.
 ## Default configuration
 
 * `monerod` and `monero-wallet-rpc`
-  - `--log-level=0`
+  - `--log-level=$LOG_LEVEL` (**default**: `0`)
   - `--confirm-external-bind`
-  - `--rpc-bind-ip=0.0.0.0`
-  - `--rpc-bind-port=18081`
+  - `--rpc-bind-ip=$RPC_BIND_IP` (**default**: `0.0.0.0`)
+  - `--rpc-bind-port=$RPC_BIND_PORT` (**default**: `18081`)
 * Adapt default configuration using environment variables:
-  - `--log-level=$LOG_LEVEL`
-  - `---rpc-bind-ip=$RPC_BIND_IP`
-  - `--rpc-bind-port=$RPC_BIND_PORT`
+  - `-e LOG_LEVEL=3`
+  - `-e RPC_BIND_IP=127.0.0.1`
+  - `-e RPC_BIND_PORT=18081`
 
 **Hint**:
 The path `/monero` in the docker container is a volume and can be mapped to a path on the client.
