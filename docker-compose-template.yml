@@ -1,0 +1,25 @@
+version: '2'
+
+services:
+  monerod:
+    build: .
+    command: --stagenet --data-dir /monero --p2p-bind-ip=0.0.0.0 --p2p-bind-port=38080 --non-interactive
+    # user: "1000:1000"
+    volumes:
+      # /monero in container should eventually contain the contents of the folder .bitmonero
+      - <path_to_contents_of_.bitmonero>:/monero
+    ports:
+      - "38080:38080"
+      - "38081:38081"
+    environment:
+      - P2P_BIND_IP=0.0.0.0
+      - P2P_BIND_PORT=38080
+      - LOG_LEVEL=0
+      - RPC_BIND_IP=0.0.0.0
+      - RPC_BIND_PORT=38081
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: 10m
+        max-file: "3"
