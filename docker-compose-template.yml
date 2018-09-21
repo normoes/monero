@@ -2,9 +2,12 @@ version: '2'
 
 services:
   monerod:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        USER_ID: 1000
     command: --stagenet --data-dir /monero --p2p-bind-ip=0.0.0.0 --p2p-bind-port=38080 --non-interactive
-    # user: "1000:1000"
     volumes:
       # /monero in container should eventually contain the contents of the folder .bitmonero
       - <path_to_contents_of_.bitmonero>:/monero

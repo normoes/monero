@@ -1,15 +1,18 @@
 
 For running `monerod` or `monero-wallet-rpc` in a docker container.
 
-This daemon is explictitely made for `mainnet` and `stagenet`.
+This daemon is explictitely made for `mainnet` and `stagenet`, since it downloads and installs the binaries from https://getmonero.org/downloads/.
 
-It runs monero `0.12.3.0`, `x64` and the docker image is based on   ubuntu:16.04  .
+It runs monero `0.12.3.0`, `x64` and the docker image is based on ubuntu:16.04  .
 
 
-A `testnet` daemon will follow.
+A `testnet` daemon will follow (based on `monero master branch`).
 
 **Hint**:
 The IPs, the daemon or RPC are binding to, need to be `0.0.0.0` instead of `127.0.0.1` within a docker container.
+
+**Hint**:
+In the repository you can find a template for `docker-compose`. This is supposed to be an example on how to configure and use the image.
 
 ## Default configuration
 
@@ -25,6 +28,9 @@ The IPs, the daemon or RPC are binding to, need to be `0.0.0.0` instead of `127.
 
 **Hint**:
 The path `/monero` in the docker container is a volume and can be mapped to a path on the client.
+
+**Hint**:
+The `uid` of the user running `monerod` (**default**: 500) is configurable. `USER_ID` is implemented as `ARG` in the Dockerfile and can be set on build (In the repository you can find a template for `docker-compose`.).
 
 ## monerod
 

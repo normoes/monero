@@ -26,6 +26,8 @@ RUN curl https://downloads.getmonero.org/cli/monero-linux-$ARCH_TYPE-v$MONERO_VE
 
 FROM ubuntu:16.04
 
+ARG USER_ID=500
+
 COPY --from=build /data /data
 COPY entrypoint.sh /entrypoint.sh
 
@@ -33,7 +35,7 @@ COPY entrypoint.sh /entrypoint.sh
 RUN apt-get update && apt-get install -y libpcsclite1 \
   && apt-get autoremove --purge -y \
   && rm -rf /var/tmp/* /tmp/* /var/lib/apt/lists/* \
-  && adduser --system --group --uid 1000 --no-create-home --shell /bin/false monero \
+  && adduser --system --group --uid $USER_ID --no-create-home --shell /bin/false monero \
   && chmod +x /entrypoint.sh \
   && mv /data/* /usr/local/bin/ \
   && rm -rf /data
