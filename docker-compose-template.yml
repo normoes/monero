@@ -1,0 +1,32 @@
+version: '2'
+
+services:
+  monerod-testnet:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        USER_ID: 1000
+        #BRANCH: v0.12.3.0
+        # v0.12.3.0: /monero/build/release/bin
+        # master:    /monero/build/Linux/master/release/bin
+        #BUILD_PATH: /monero/build/Linux/master/release/bin
+    command: --testnet --data-dir /monero --non-interactive
+    volumes:
+      # /monero in container should eventually contain the contents of the folder .bitmonero
+      - <path_to_contents_of_.bitmonero>:/monero
+    ports:
+      - "28080:28080"
+      - "28081:28081"
+    environment:
+      - P2P_BIND_IP=0.0.0.0
+      - P2P_BIND_PORT=28080
+      - LOG_LEVEL=0
+      - RPC_BIND_IP=0.0.0.0
+      - RPC_BIND_PORT=28081
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: 10m
+        max-file: "3"
