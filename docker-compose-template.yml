@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
       args:
         USER_ID: 1000
-    command: --stagenet --data-dir /monero --p2p-bind-ip=0.0.0.0 --p2p-bind-port=38080 --non-interactive
+    command: --stagenet --data-dir /monero --non-interactive
     volumes:
       # /monero in container should eventually contain the contents of the folder .bitmonero
       - <path_to_contents_of_.bitmonero>:/monero

@@ -21,16 +21,24 @@ In the repository you can find a template for `docker-compose`. This is supposed
   - `--confirm-external-bind`
   - `--rpc-bind-ip=$RPC_BIND_IP` (**default**: `0.0.0.0`)
   - `--rpc-bind-port=$RPC_BIND_PORT` (**default**: `18081`)
+* only `monerod`
+  - `--p2p-bind-ip=$P2P_BIND_IP` (**default**: `0.0.0.0`)
+  - `--p2p-bind-port=$P2P_BIND_PORT` (**default**: `18080`)
 * Adapt default configuration using environment variables:
   - `-e LOG_LEVEL=3`
   - `-e RPC_BIND_IP=127.0.0.1`
   - `-e RPC_BIND_PORT=18081`
+  - `-e P2P_BIND_IP=0.0.0.0`
+  - `-e P2P_BIND_PORT=18080`
 
 **Hint**:
 The path `/monero` in the docker container is a volume and can be mapped to a path on the client.
 
 **Hint**:
-The `uid` of the user running `monerod` (**default**: 500) is configurable. `USER_ID` is implemented as `ARG` in the Dockerfile and can be set on build (In the repository you can find a template for `docker-compose`.).
+The `uid` of the user running `monerod` (**default**: 500) is configurable. `USER_ID` is implemented as `ARG` in the Dockerfile and can be set on build.
+
+**Hint**:
+Check the repository for `docker-compose` templates. They can be used to start `monerod` or `monero-wallet-rpc`, respectively.
 
 ## monerod
 
@@ -44,23 +52,22 @@ Without any additional command
 Any additional `monerod` parameters can be passed as command:
 
 ```
-docker run --rm -it -v <path_to_contents_of_.bitmonero>:/monero normoes/monero --p2p-bind-ip=0.0.0.0 --p2p-bind-port=18080 --data-dir /monero --non-interactive
+docker run --rm -it -p 18081:18081 -v <path_to_contents_of_.bitmonero>:/monero normoes/monero --data-dir /monero --non-interactive
 ```
 
 **Hint**:
-The path `/monero` is supposed to be used as `--data-dir` configuration for `monerod`. Here the synchronized blockchain data is stored. So when mounted `/monero` should contain the files from within `.bitmonero`.
+The path `/monero` is supposed to be used as `--data-dir` configuration for `monerod`. Here the synchronized blockchain data is stored. So when mounted, `/monero` should contain the files from within `.bitmonero`.
 
 
 ## monero-wallet-rpc
 
-
-When used as `monero-wallet-rpc` the full command is necessary as command to the docker run command:
+When used as `monero-wallet-rpc` the full command is necessary as command to docker run:
 
 ```
-docker run --rm -it -v <path_tp_wallet>:/monero --net host normoes/monero monero-wallet-rpc --daemon-host 127.0.0.1  --wallet-file wallet --password-file wallet.passwd --disable-rpc-login
+docker run --rm -it -e RPC_BIND_PORT=18083 -v <path_to_contents_of_wallet_folder>:/monero --net host normoes/monero monero-wallet-rpc --daemon-host <host>  --wallet-file wallet --password-file wallet.passwd --disable-rpc-login
 ```
 
-`monero-wallet-rpc` starts with the above default configuration plus additional options passed in the actual docker run command.
+`monero-wallet-rpc` starts with the above default configuration plus additional options passed in the actual docker run command, like `-e RPC_BIND_PORT=18083`.
 
 To secure `monero-wallet-rpc` replace `--disable-rpc-login` by `rpc-login user:password`. Any JSON RPC request should then be provided with user credentials like this:
 
@@ -70,4 +77,4 @@ To secure `monero-wallet-rpc` replace `--disable-rpc-login` by `rpc-login user:p
 
 
 **Hint**:
-The path `/monero` is supposed to contain the actual wallet files. So when mounted `/monero` should contain the files from within e.g. `~/Monero/wallets/wallet/`.
+The path `/monero` is supposed to contain the actual wallet files. So when mounted, `/monero` should contain the files from within e.g. `~/Monero/wallets/wallet/`.
