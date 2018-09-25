@@ -1,1 +1,5 @@
+# local development
+docker-compose.yml
+docker-compose-main.yml
+docker-compose-rpc.yml
 *.txt

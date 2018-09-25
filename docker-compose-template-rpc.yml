@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
       args:
         USER_ID: 1000
-    command: monero-wallet-rpc --stagenet --daemon-host <host> --wallet-file wallet --password-file wallet.passwd --disable-rpc-login
+    command: monero-wallet-rpc --testnet --daemon-host <host> --wallet-file wallet --password-file wallet.passwd --disable-rpc-login
     volumes:
       - <path_to_contents_of_wallet_folder>:/monero
     ports:

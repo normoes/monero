@@ -38,7 +38,7 @@ RUN apt-get update && apt-get -y install \
     && cd /usr/src/gtest \
     && cmake . \
     && make \
-    && mv libg* /usr/lib/ \
+    && mv libg* /usr/lib/
 
 #RUN git clone --recursive $MONERO_URL
 RUN git clone -b "$BRANCH" --single-branch --depth 1 --recursive $MONERO_URL
@@ -50,7 +50,7 @@ COPY entrypoint.sh /entrypoint.sh
 
 RUN apt-get purge -y git \
     && apt-get autoremove --purge -y \
-    && rm -rf /var/tmp/* /tmp/* /var/lib/apt/lists/*
+    && rm -rf /var/tmp/* /tmp/* /var/lib/apt/lists/* \
     && mv /data$BUILD_PATH/monerod /usr/local/bin/ \
     && mv /data$BUILD_PATH/monero-wallet-rpc /usr/local/bin/ \
     && rm -rf /data \
