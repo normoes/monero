@@ -9,6 +9,7 @@ services:
         USER_ID: 1000
         #BRANCH: v0.12.3.0
         # v0.12.3.0: /monero/build/release/bin
+        # v0.13.0.1-RC1 /monero/build/Linux/_no_branch_/release/bin
         # master:    /monero/build/Linux/master/release/bin
         #BUILD_PATH: /monero/build/Linux/master/release/bin
     command: --testnet --data-dir /monero --non-interactive
