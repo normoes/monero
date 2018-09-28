@@ -1,7 +1,7 @@
 version: '2'
 
 services:
-  monerod-testnet:
+  monero-cli:
     build: .
       # context: .
       # dockerfile: Dockerfile
@@ -11,23 +11,17 @@ services:
         # v0.13.0.1-RC1 /monero/build/Linux/_no_branch_/release/bin
         # master:    /monero/build/Linux/master/release/bin
         #BUILD_PATH: /monero/build/Linux/master/release/bin
-    command: --testnet --data-dir /monero --non-interactive
+    command: monero-wallet-cli --testnet --daemon-host <host> --wallet-file wallet --password-file wallet.passwd
     volumes:
-      # /monero in container should eventually contain the contents of the folder .bitmonero
-      - <path_to_contents_of_.bitmonero>:/monero
-    ports:
-      - "28080:28080"
-      - "28081:28081"
+      - <path_to_contents_of_wallet_folder>:/monero
+    stdin_open: true
+    tty: true
     environment:
       - USER_ID=1000
-      - P2P_BIND_IP=0.0.0.0
-      - P2P_BIND_PORT=28080
       - LOG_LEVEL=0
-      - RPC_BIND_IP=0.0.0.0
-      - RPC_BIND_PORT=28081
-    restart: unless-stopped
     logging:
       driver: "json-file"
       options:
         max-size: 10m
         max-file: "3"
+    restart: unless-stopped

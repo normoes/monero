@@ -1,16 +1,27 @@
 #!/bin/bash
 
-# used for monerod and monero-wallet-rpc
-OPTIONS="--log-level=$LOG_LEVEL --confirm-external-bind --rpc-bind-ip=$RPC_BIND_IP --rpc-bind-port=$RPC_BIND_PORT"
-# used for monerod
-MONEROD_OPTIONS="--p2p-bind-ip=$P2P_BIND_IP --p2p-bind-port=$P2P_BIND_PORT"
+LOGGING="--log-level $LOG_LEVEL"
 
-MONEROD="monerod $@ $OPTIONS $MONEROD_OPTIONS --check-updates disabled"
+# used for monerod and monero-wallet-rpc
+RPC_OPTIONS="$LOGGING --confirm-external-bind --rpc-bind-ip $RPC_BIND_IP --rpc-bind-port $RPC_BIND_PORT"
+# used for monerod
+MONEROD_OPTIONS="--p2p-bind-ip $P2P_BIND_IP --p2p-bind-port $P2P_BIND_PORT"
+
+MONEROD="monerod $@ $RPC_OPTIONS $MONEROD_OPTIONS --check-updates disabled"
 
 if [[ "${1:0:1}" = '-' ]]  || [[ -z "$@" ]]; then
   set -- $MONEROD
-else
-  set -- "$@ $OPTIONS"
+elif [ "$1" = "monero-wallet-rpc" ]; then
+  set -- "$@ $RPC_OPTIONS"
+elif [ "$1" = "monero-wallet-cli" ]; then
+  set -- "$@ $LOGGING"
+fi
+
+# allow the container to be started with `--user
+if [ "$(id -u)" = 0 ]; then
+  # USER_ID defaults to 1000 (Dockerfile)
+  adduser --system --group --uid "$USER_ID" --shell /bin/false monero &> /dev/null
+  exec su-exec monero $@
 fi
 
 exec $@
