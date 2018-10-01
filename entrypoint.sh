@@ -9,12 +9,20 @@ MONEROD_OPTIONS="--p2p-bind-ip $P2P_BIND_IP --p2p-bind-port $P2P_BIND_PORT"
 
 MONEROD="monerod $@ $RPC_OPTIONS $MONEROD_OPTIONS --check-updates disabled"
 
+# COMMAND="$@"
+
 if [[ "${1:0:1}" = '-' ]]  || [[ -z "$@" ]]; then
   set -- $MONEROD
-elif [ "$1" = "monero-wallet-rpc" ]; then
+elif [[ "$1" = monero-wallet-rpc* ]]; then
   set -- "$@ $RPC_OPTIONS"
-elif [ "$1" = "monero-wallet-cli" ]; then
+  # prefix="monero-wallet-rpc"
+  # COMMAND=${COMMAND#$prefix}
+  # set -- "$prefix $COMMAND $RPC_OPTIONS"
+elif [[ "$1" = monero-wallet-cli* ]]; then
   set -- "$@ $LOGGING"
+  # prefix="monero-wallet-cli"
+  # COMMAND=${COMMAND#$prefix}
+  # set -- "$prefix $COMMAND $LOGGING"
 fi
 
 # allow the container to be started with `--user

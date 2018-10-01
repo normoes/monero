@@ -11,8 +11,9 @@ ARG BRANCH=master
 ARG BUILD_PATH=/monero/build/Linux/master/release/bin
 # specific branch
 #ARG BRANCH=v0.12.3.0
-#BUILD_PATH=/monero/build/release/bin
-#ARG BRANCH=v0.13.0.1-RC1
+#ARG BUILD_PATH=/monero/build/release/bin
+# ARG BRANCH=v0.13.0.1-RC1
+# ARG BUILD_PATH=/monero/build/Linux/_no_branch_/release/bin
 
 WORKDIR /data
 
