@@ -1,23 +1,8 @@
 FROM debian:stable-slim as builder
 
-# BUILD_PATH:
-# v0.12.3.0: /monero/build/release/bin
-# v0.13.0.1-RC1: /monero/build/Linux/_no_branch_/release/bin
-# master:    /monero/build/Linux/master/release/bin
-
-ARG MONERO_URL=https://github.com/monero-project/monero.git
-# master branch
-ARG BRANCH=master
-ARG BUILD_PATH=/monero/build/Linux/master/release/bin
-# specific branch
-#ARG BRANCH=v0.12.3.0
-#ARG BUILD_PATH=/monero/build/release/bin
-# ARG BRANCH=v0.13.0.1-RC1
-# ARG BUILD_PATH=/monero/build/Linux/_no_branch_/release/bin
-
 WORKDIR /data
 
-RUN apt-get update && apt-get -y install \
+RUN apt-get update -qq && apt-get -y install \
         build-essential \
         cmake \
         pkg-config \
@@ -44,7 +29,16 @@ RUN apt-get update && apt-get -y install \
 
 RUN git clone https://github.com/ncopa/su-exec.git su-exec-clone \
     && cd su-exec-clone && make && cp su-exec /data && cd /data
-#RUN git clone --recursive $MONERO_URL
+
+# BUILD_PATH:
+# v0.12.3.0: /monero/build/release/bin
+# v0.13.0.1-RC1: /monero/build/Linux/_no_branch_/release/bin
+# master:    /monero/build/Linux/master/release/bin
+
+ARG MONERO_URL=https://github.com/monero-project/monero.git
+ARG BRANCH=master
+ARG BUILD_PATH=/monero/build/Linux/master/release/bin
+
 RUN git clone -b "$BRANCH" --single-branch --depth 1 --recursive $MONERO_URL
 RUN cd monero \
     && make
@@ -85,7 +79,7 @@ COPY --from=builder /data/monero-wallet-cli /usr/local/bin/
 COPY --from=builder /data/su-exec /usr/local/bin/
 COPY entrypoint.sh /entrypoint.sh
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update -qq && apt-get install -y \
         libboost-all-dev \
         libzmq3-dev \
         libunbound-dev \
