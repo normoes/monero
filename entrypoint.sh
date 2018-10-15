@@ -2,6 +2,8 @@
 
 LOGGING="--log-level $LOG_LEVEL"
 
+DAEMON_OPTIONS="--daemon-host $DAEMON_HOST --daemon-port $DAEMON_PORT"
+
 # used for monerod and monero-wallet-rpc
 RPC_OPTIONS="$LOGGING --confirm-external-bind --rpc-bind-ip $RPC_BIND_IP --rpc-bind-port $RPC_BIND_PORT"
 # used for monerod
@@ -14,12 +16,12 @@ MONEROD="monerod $@ $RPC_OPTIONS $MONEROD_OPTIONS --check-updates disabled"
 if [[ "${1:0:1}" = '-' ]]  || [[ -z "$@" ]]; then
   set -- $MONEROD
 elif [[ "$1" = monero-wallet-rpc* ]]; then
-  set -- "$@ $RPC_OPTIONS"
+  set -- "$@ $DAEMON_OPTIONS $RPC_OPTIONS"
   # prefix="monero-wallet-rpc"
   # COMMAND=${COMMAND#$prefix}
   # set -- "$prefix $COMMAND $RPC_OPTIONS"
 elif [[ "$1" = monero-wallet-cli* ]]; then
-  set -- "$@ $LOGGING"
+  set -- "$@ $DAEMON_OPTIONS $LOGGING"
   # prefix="monero-wallet-cli"
   # COMMAND=${COMMAND#$prefix}
   # set -- "$prefix $COMMAND $LOGGING"

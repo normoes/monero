@@ -11,7 +11,7 @@ services:
         # v0.13.0.1-RC1 /monero/build/Linux/_no_branch_/release/bin
         # master:    /monero/build/Linux/master/release/bin
         #BUILD_PATH: /monero/build/Linux/master/release/bin
-    command: monero-wallet-rpc --testnet --daemon-host <host> --wallet-file wallet --password-file wallet.passwd --disable-rpc-login
+    command: monero-wallet-rpc --testnet --wallet-file wallet --password-file wallet.passwd --disable-rpc-login
     volumes:
       - <path_to_contents_of_wallet_folder>:/monero
     ports:
@@ -19,6 +19,8 @@ services:
     environment:
       - USER_ID=1000
       - LOG_LEVEL=0
+      - DAEMON_HOST=<host>
+      - DAEMON_PORT=28081
       - RPC_BIND_IP=0.0.0.0
       - RPC_BIND_PORT=28083
     logging:
