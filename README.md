@@ -6,8 +6,8 @@ This daemon is built from source: [monero project](https://github.com/monero-pro
 * `stagenet`/`mainnet`: Use the version tags like `0.12.3.0` or `0.13.0.1-RC1`.
 * `testnet`: Use the `master` tag.
   - Generally, it is recommended to use `master` branch when working on `testnet`.
-  - Of course, this tag can also be used with `mainnet` and `stagenet`.
-* The `latest` docker image is the same as `master`.
+  - Of course, `latest` can also be used with `mainnet` and `stagenet`.
+* The `latest` docker image is built on `master` branch.
 
 ## default configuration
 
@@ -18,19 +18,24 @@ This daemon is built from source: [monero project](https://github.com/monero-pro
     + No existing user is used then
   - Running `monero` as `root` is not possible (`USER_ID` defaults to 1000).
 * `monerod` and `monero-wallet-rpc`
-  - `--log-level=$LOG_LEVEL` (**default**: `0`)
+  - `--log-level=$LOG_LEVEL` (**default**: `0`) (also `monero-wallet-cli`)
   - `--confirm-external-bind`
   - `--rpc-bind-ip=$RPC_BIND_IP` (**default**: `0.0.0.0`)
-  - `--rpc-bind-port=$RPC_BIND_PORT` (**default**: `18081`)
+  - `--rpc-bind-port=$RPC_BIND_PORT` (**default**: `28081`)
 * only `monerod`
   - `--p2p-bind-ip=$P2P_BIND_IP` (**default**: `0.0.0.0`)
-  - `--p2p-bind-port=$P2P_BIND_PORT` (**default**: `18080`)
+  - `--p2p-bind-port=$P2P_BIND_PORT` (**default**: `28080`)
+* only `monero-wallet-rpc` and `monero-wallet-cli`  
+  - `--daemon-host=$DAEMON_HOST` (**default**: `127.0.0.1`)
+  - `--daemon-port=$DAEMON_PORT` (**default**: `28081`)
 * Adapt default configuration using environment variables:
   - `-e LOG_LEVEL=3`
   - `-e RPC_BIND_IP=127.0.0.1`
   - `-e RPC_BIND_PORT=18081`
   - `-e P2P_BIND_IP=0.0.0.0`
-  - `-e P2P_BIND_PORT=18080`  
+  - `-e P2P_BIND_PORT=18080`
+  - `-e DAEMON_HOST=localhost` (assuming daemon is running locally)
+  - `-e DAEMON_PORT=18081` (assuming daemon listens on port `18081`)
 
 ### hint:
 * The IPs, the daemon or RPC are binding to, need to be `0.0.0.0` instead of `127.0.0.1` within a docker container.
@@ -54,7 +59,8 @@ docker run --rm -d -p 18081:18081 -v <path_to_contents_of_.bitmonero>:/monero xm
 ```
 
 ### user
-Run `monerod` as different user (`uid != 1000 && uid != 0`).
+Run `monerod` as different user (`uid != 1000 && uid != 0`). This is useful if deployed to several systems (AWS ec2-user: `uid=500`).
+
 Abbreviated command:
 
 ```
@@ -76,15 +82,16 @@ The path `/monero` is supposed to be used as `--data-dir` configuration for `mon
 When used as `monero-wallet-rpc` the full command is necessary as command to docker run:
 
 ```
-docker run --rm -d --net host -e RPC_BIND_PORT=18083 -v <path_to_contents_of_wallet_folder>:/monero xmrto/monero monero-wallet-rpc --daemon-host <host>  --wallet-file wallet --password-file wallet.passwd --disable-rpc-login
+docker run --rm -d --net host -e DAEMON_HOST=node.xmr.to -e DAEMON_PORT=18081 -e RPC_BIND_PORT=18083 -v <path_to_contents_of_wallet_folder>:/monero xmrto/monero monero-wallet-rpc  --wallet-file wallet --password-file wallet.passwd --disable-rpc-login
 ```
 
 ### user
-Run `monero-wallet-rpc` as different user (`uid != 1000 && uid != 0`).
+Run `monero-wallet-rpc` as different user (`uid != 1000 && uid != 0`). This is useful if deployed to several systems (AWS ec2-user: `uid=500`).
+
 Abbreviated command:
 
 ```
-docker run --rm -d --net host -e RPC_BIND_PORT=18083 -e USER_ID=500 -v <host>:<container> xmrto/monero monero-wallet-rpc <options>
+docker run --rm -d --net host -e DAEMON_HOST=node.xmr.to -e DAEMON_PORT=18081 -e RPC_BIND_PORT=18083 -e USER_ID=500 -v <host>:<container> xmrto/monero monero-wallet-rpc <options>
 ```
 
 ### rpc
@@ -106,17 +113,18 @@ The path `/monero` is supposed to contain the actual wallet files. So when mount
 When used as `monero-wallet-cli` the full command is necessary as command to docker run:
 
 ```
-docker run --rm -it -v <path_to_contents_of_wallet_folder>:/monero --net host xmrto/monero monero-wallet-cli --daemon-host <host>  --wallet-file wallet --password-file wallet.passwd
+docker run --rm -it -e DAEMON_HOST=node.xmr.to -e DAEMON_PORT=18081 -v <path_to_contents_of_wallet_folder>:/monero --net host xmrto/monero monero-wallet-cli --wallet-file wallet --password-file wallet.passwd
 ```
 
 Attaching to the container then allows you to use `monero-wallet-cli` commands.
 
 ### user
-Run `monero-wallet-cli` as different user (`uid != 1000 && uid != 0`).
+Run `monero-wallet-cli` as different user (`uid != 1000 && uid != 0`). This is useful if deployed to several systems (AWS ec2-user: `uid=500`).
+
 Abbreviated command:
 
 ```
-docker run --rm -it --net host -e USER_ID=500 -v <host>:<container> xmrto/monero monero-wallet-cli <options>
+docker run --rm -it --net host -e DAEMON_HOST=node.xmr.to -e DAEMON_PORT=18081 -e USER_ID=500 -v <host>:<container> xmrto/monero monero-wallet-cli <options>
 ```
 
 ### hint
