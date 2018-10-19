@@ -38,15 +38,16 @@ RUN cd /data \
 # v0.12.3.0: /monero/build/release/bin
 # v0.13.0.1-RC1: /monero/build/Linux/_no_branch_/release/bin
 # master:    /monero/build/Linux/master/release/bin
+# Using 'USE_SINGLE_BUILDDIR=1 make' creates a unified build dir (/monero/build/release/bin)
 
 ARG MONERO_URL=https://github.com/monero-project/monero.git
 ARG BRANCH=master
-ARG BUILD_PATH=/monero/build/Linux/master/release/bin
+ARG BUILD_PATH=/monero/build/release/bin
 
 RUN cd /data \
     && git clone -b "$BRANCH" --single-branch --depth 1 --recursive $MONERO_URL
 RUN cd monero \
-    && make \
+    && USE_SINGLE_BUILDDIR=1 make \
     && mv /data$BUILD_PATH/monerod /data/ \
     && chmod +x /data/monerod \
     && mv /data$BUILD_PATH/monero-wallet-rpc /data/ \
@@ -74,9 +75,12 @@ RUN apt-get purge -y \
         libgtest-dev \
         git \
     && apt-get autoremove --purge -y \
-    && rm -rf /var/tmp/* /tmp/* /var/lib/apt/lists/* \
+    && apt-get clean \
+    && rm -rf /var/tmp/* /tmp/* /var/lib/apt \
     && rm -rf /data/monero \
     && rm -rf /data/su-exec-clone
+
+# /var/lib/apt/lists/* \
 
 FROM debian:stable-slim
 COPY --from=builder /data/monerod /usr/local/bin/
@@ -90,7 +94,8 @@ RUN apt-get update -qq && apt-get install -y \
         libunbound-dev \
         libexpat1-dev \
     && apt-get autoremove --purge -y \
-    && rm -rf /var/tmp/* /tmp/* /var/lib/apt/lists/*
+    && apt-get clean \
+    && rm -rf /var/tmp/* /tmp/* /var/lib/apt
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh

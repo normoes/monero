@@ -1,13 +1,18 @@
+## Supported tags and respective `Dockerfile` links
+* `latest` ([Dockerfile](https://github.com/XMRto/monero/blob/master/Dockerfile))
+* `v0.13.0.3` ([Dockerfile](https://github.com/XMRto/monero/blob/v0.13.0.3/Dockerfile))
+
+---
 
 For running `monerod` or `monero-wallet-rpc` or `monero-wallet-cli` in a docker container.
 
 This daemon is built from source: [monero project](https://github.com/monero-project/monero).
 
-* `stagenet`/`mainnet`: Use the version tags like `0.12.3.0` or `0.13.0.1-RC1`.
+* Monero stable for `stagenet`/`mainnet`: Use version tags like `v0.13.0.3`.
 * `testnet`: Use the `master` tag.
   - Generally, it is recommended to use `master` branch when working on `testnet`.
   - Of course, `latest` can also be used with `mainnet` and `stagenet`.
-* The `latest` docker image is built on `master` branch.
+* The `latest` docker image is based on `master` branch.
 
 ## default configuration
 
