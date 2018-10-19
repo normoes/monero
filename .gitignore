@@ -1,6 +1,6 @@
 # local development
 docker-compose.yml
-docker-compose-main.yml
+docker-compose-patched.yml
 docker-compose-rpc.yml
 docker-compose-cli.yml
 *.txt
