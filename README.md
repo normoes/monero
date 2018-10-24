@@ -1,6 +1,6 @@
 ## Supported tags and respective `Dockerfile` links
 * `latest` ([Dockerfile](https://github.com/XMRto/monero/blob/master/Dockerfile))
-* `v0.13.0.3` ([Dockerfile](https://github.com/XMRto/monero/blob/v0.13.0.3/Dockerfile))
+* `v0.13.0.4` ([Dockerfile](https://github.com/XMRto/monero/blob/v0.13.0.4/Dockerfile))
 
 ---
 
@@ -45,8 +45,8 @@ This daemon is built from source: [monero project](https://github.com/monero-pro
 ### hint:
 * The IPs, the daemon or RPC are binding to, need to be `0.0.0.0` instead of `127.0.0.1` within a docker container.
 * The path `/monero` in the docker container is a volume and can be mapped to a path on the client.
-
-Check the repository for `docker-compose` templates. They show configuration examples of `monerod` and `monero-wallet-rpc`, respectively.
+* It is possible to set `USER_ID` to a desired `uid` (a user wit this `uid` is then created). Nevertheless permissions on the mounted volume's data should be checked to be in line with this `uid`.
+* The github repository contains hooks for cloud providers (e.g. docker cloud). Those are not needed for creating/running docker containers from the images found here.
 
 ## monerod
 
