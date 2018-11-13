@@ -6,7 +6,7 @@ services:
     command: --testnet --data-dir /monero --non-interactive
     volumes:
       # /monero in container should eventually contain the contents of the folder .bitmonero
-      - <path_to_contents_of_.bitmonero>:/monero
+      - <path/to/and/including/.bitmonero>:/monero
     ports:
       - "28080:28080"
       - "28081:28081"

@@ -5,7 +5,7 @@ services:
     build: .
     command: monero-wallet-cli --testnet --wallet-file wallet --password-file wallet.passwd
     volumes:
-      - <path_to_contents_of_wallet_folder>:/monero
+      - <path/to/and/including/wallet_folder>:/monero
     stdin_open: true
     tty: true
     environment:
