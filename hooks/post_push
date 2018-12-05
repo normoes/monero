@@ -1,11 +1,11 @@
 #!/bin/bash
 
-if [ "$RELEASE_BRANCH" = "$SOURCE_BRANCH" ]; then
+if [ "$RELEASE_BRANCH" == "$SOURCE_BRANCH" ]; then
   curl -X POST \
        -F token=$MONERO_TESTNET_TOKEN \
        -F ref=$SOURCE_BRANCH \
        $MONERO_TESTNET_URL
-elif [ "$PATCHED_BRANCH" = "$SOURCE_BRANCH" ]; then
+elif [ "$PATCHED_BRANCH" == "$SOURCE_BRANCH" ]; then
   curl -X POST \
        -F token=$MONERO_DAEMON_TOKEN \
        -F ref=$BRANCH_MAIN \
