@@ -1,0 +1,24 @@
+#!/bin/bash
+
+BRANCH=$(curl -s https://api.github.com/repos/monero-project/monero/tags | grep -i name | awk 'NR==1{print $2}' | tr -d "\",")
+if [ zn "$BRANCH" ];then
+  echo "no branch could be found."
+  exit 1
+fi
+docker build --build-arg BRANCH=$BRANCH -t $IMAGE_NAME .
+
+  # some kind of test
+docker run --rm --entrypoint='' $IMAGE_NAME  monerod --version
+ERROR_MONEROD="$?"
+docker run --rm --entrypoint='' $IMAGE_NAME  monero-wallet-rpc --version
+ERROR_MONERO_RPC="$?"
+docker run --rm --entrypoint='' $IMAGE_NAME  monero-wallet-cli --version
+ERROR_MONERO_CLI="$?"
+
+# none of them should exit with 1
+if [ "$ERROR_MONEROD" -eq 1 -o "$ERROR_MONERO_RPC" -eq 1 -o "$ERROR_MONERO_CLI" -eq 1 ]; then
+    echo "error code monerod: $ERROR_MONEROD"
+    echo "error code monero-wallet-rpc: $ERROR_MONERO_RPC"
+    echo "error code monero-wallet-cli: $ERROR_MONERO_CLI"
+    exit 1
+fi
