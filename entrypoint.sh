@@ -27,6 +27,8 @@ elif [[ "$1" = monero-wallet-cli* ]]; then
   # set -- "$prefix $COMMAND $LOGGING"
 fi
 
+echo "$@"
+
 # allow the container to be started with `--user
 if [ "$(id -u)" = 0 ]; then
   # USER_ID defaults to 1000 (Dockerfile)
