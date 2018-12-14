@@ -16,6 +16,11 @@ elif [ "$PATCHED_BRANCH" == "$SOURCE_BRANCH" ]; then
        $MONERO_DAEMON_URL
 else
   # other branches are also pushed as most_recent_tag
-  docker tag $IMAGE_NAME $DOCKER_REPO:$MOST_RECENT_TAG_NAME
-  docker push $DOCKER_REPO:$MOST_RECENT_TAG_NAME
+  BRANCH=$(curl -s https://api.github.com/repos/monero-project/monero/tags | grep -i name | awk 'NR==1{print $2}' | tr -d "\",")
+  if [ zn "$BRANCH" ];then
+    echo "no branch could be found."
+    exit 1
+  fi
+  docker tag $IMAGE_NAME $DOCKER_REPO:$BRANCH
+  docker push $DOCKER_REPO:$BRANCH
 fi

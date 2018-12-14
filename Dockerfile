@@ -41,7 +41,7 @@ RUN cd /data \
 # Using 'USE_SINGLE_BUILDDIR=1 make' creates a unified build dir (/monero/build/release/bin)
 
 ARG MONERO_URL=https://github.com/monero-project/monero.git
-ARG BRANCH=master
+ARG BRANCH
 ARG BUILD_PATH=/monero/build/release/bin
 
 RUN cd /data \
@@ -101,6 +101,11 @@ COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 WORKDIR /monero
+
+RUN monerod --version > version.txt \
+    && cat /etc/os-release > system.txt \
+    && ldd $(command -v monerod) > dependencies.txt
+
 VOLUME ["/monero"]
 
 ENV USER_ID 1000

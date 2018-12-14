@@ -1,0 +1,9 @@
+#!/bin/bash
+
+BRANCH="master"
+if [ zn "$BRANCH" ];then
+  echo "no branch could be found."
+  exit 1
+fi
+docker build --build-arg BRANCH=$BRANCH -t $IMAGE_NAME .
+
