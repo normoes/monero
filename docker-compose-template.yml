@@ -2,7 +2,11 @@ version: '2'
 
 services:
   monerod-testnet:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BRANCH: master
     command: --testnet --data-dir /monero --non-interactive
     volumes:
       # /monero in container should eventually contain the contents of the folder .bitmonero
