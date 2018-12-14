@@ -2,7 +2,11 @@ version: '2'
 
 services:
   monero-rpc:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BRANCH: v0.13.0.4
     command: monero-wallet-rpc --testnet --wallet-file wallet --password-file wallet.passwd --disable-rpc-login
     volumes:
       - <path/to/and/including/wallet_folder>:/monero
