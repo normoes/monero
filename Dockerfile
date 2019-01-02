@@ -102,9 +102,9 @@ RUN chmod +x /entrypoint.sh
 
 WORKDIR /monero
 
-RUN monerod --version > version.txt \
-    && cat /etc/os-release > system.txt \
-    && ldd $(command -v monerod) > dependencies.txt
+RUN monerod --version > /version.txt \
+    && cat /etc/os-release > /system.txt \
+    && ldd $(command -v monerod) > /dependencies.txt
 
 VOLUME ["/monero"]
 

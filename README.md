@@ -15,6 +15,13 @@ This daemon is built from source: [monero project](https://github.com/monero-pro
   - Of course, `latest` can also be used with `mainnet` and `stagenet`.
 * The `latest` docker image is based on `master` branch.
 
+## system and binary information
+
+You can find the following information within the docker image:
+* `/version.txt` contains output of `monerod --version`
+* `/system.txt` contains output of `cat /etc/os-release`
+* `/dependencies.txt` contains output of `ldd $(command -v monerod)`
+
 ## default configuration
 
 * docker container user running `monero`
