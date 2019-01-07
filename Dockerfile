@@ -93,18 +93,21 @@ RUN apt-get update -qq && apt-get install -y \
         libzmq3-dev \
         libunbound-dev \
         libexpat1-dev \
+        torsocks \
     && apt-get autoremove --purge -y \
     && apt-get clean \
     && rm -rf /var/tmp/* /tmp/* /var/lib/apt
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
+COPY torsocks.conf /etc/tor/torsocks.conf
 
 WORKDIR /monero
 
 RUN monerod --version > /version.txt \
     && cat /etc/os-release > /system.txt \
-    && ldd $(command -v monerod) > /dependencies.txt
+    && ldd $(command -v monerod) > /dependencies.txt \
+    && torsocks --version > /torsocks.txt
 
 VOLUME ["/monero"]
 
@@ -116,5 +119,6 @@ ENV RPC_BIND_IP 0.0.0.0
 ENV RPC_BIND_PORT 28081
 ENV P2P_BIND_IP 0.0.0.0
 ENV P2P_BIND_PORT 28080
+ENV USE_TORSOCKS NO
 
 ENTRYPOINT ["/entrypoint.sh"]
