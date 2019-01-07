@@ -29,10 +29,15 @@ fi
 
 echo "$@"
 
+if [ "$USE_TORSOCKS" == "YES" ]; then
+  set -- "torsocks $@"
+fi
+
 # allow the container to be started with `--user
 if [ "$(id -u)" = 0 ]; then
   # USER_ID defaults to 1000 (Dockerfile)
   adduser --system --group --uid "$USER_ID" --shell /bin/false monero &> /dev/null
+
   exec su-exec monero $@
 fi
 
