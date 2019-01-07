@@ -2,9 +2,9 @@
 
 if [ "$RELEASE_BRANCH" == "$SOURCE_BRANCH" ]; then
   curl -X POST \
-       -F token=$MONERO_TESTNET_TOKEN \
-       -F ref=$SOURCE_BRANCH \
-       $MONERO_TESTNET_URL
+       -F token=$MONERO_DAEMON_TOKEN \
+       -F ref=$BRANCH_TEST \
+       $MONERO_DAEMON_URL
 elif [ "$PATCHED_BRANCH" == "$SOURCE_BRANCH" ]; then
   curl -X POST \
        -F token=$MONERO_DAEMON_TOKEN \
@@ -15,7 +15,6 @@ elif [ "$PATCHED_BRANCH" == "$SOURCE_BRANCH" ]; then
        -F ref=$BRANCH_STAGE \
        $MONERO_DAEMON_URL
 else
-  # other branches are also pushed as most_recent_tag
   BRANCH=$(curl -s https://api.github.com/repos/monero-project/monero/tags | grep -i name | awk 'NR==1{print $2}' | tr -d "\",")
   if [ -z "$BRANCH" ];then
     echo "no branch could be found."
