@@ -172,10 +172,13 @@ The previous case can be separated, so the monero tools and the Tor proxy run in
 
 Please also refer to [xmrto/tor](https://hub.docker.com/r/xmrto/tor) for further details.
 
+In this case, you need to make the host's localhost available within the monero docker container - see below **using torsocks**.
+
 ### using torsocks
 Every monero docker image also contains `torsocks`.
 
-To start `monerod`, `monero-wallet-rpc` and `monero-wallet-cli` using `torsocks`,the environment variable `USE_TORSOCKS=YES` should be passed into the container.
+To start `monerod`, `monero-wallet-rpc` and `monero-wallet-cli` using `torsocks`, the environment variable `USE_TORSOCKS=YES` should be passed into the container.
+In case you use an external Tor proxy, you should run the docker container with `--net host` (docker cli) or `network_mode: "host"` (docker-compose) in order to make the host's localhost (and hence the external Tor proxy port) available to `torsocks`.
 
 This allows, similar to the previous case, to make monero tools available in Tor network.
 
