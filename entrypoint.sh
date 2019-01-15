@@ -29,6 +29,12 @@ fi
 
 echo "$@"
 
+if [ "$USE_TOR" == "YES" ]; then
+  chown -R debian-tor /var/lib/tor
+  # run as daemon
+  tor -f /etc/tor/torrc
+fi
+
 if [ "$USE_TORSOCKS" == "YES" ]; then
   set -- "torsocks $@"
 fi
