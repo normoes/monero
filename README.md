@@ -213,7 +213,7 @@ Log notice file /var/log/tor/notices.log
 ```
 In this case the monero daemon ports available in the clearnet, are forwarded by the Tor proxy into the Tor network.
 The option `SOCKSPort` is bound to `0.0.0.0` (all interfaces), in order to make it run within the docker container.
-The option `HiddenServiceDir /var/lib/tor/daemons/` can be used as docker volume to provide teh files `hostname` and `private_key`.
+The option `HiddenServiceDir /var/lib/tor/daemons/` can be used as docker volume to provide the files `hostname` and `private_key`.
 
 After starting the docker container you will find your hostname (**.onion address**) here:
 
