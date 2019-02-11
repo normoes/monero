@@ -17,6 +17,8 @@ services:
       - LOG_LEVEL=0
       - DAEMON_HOST=<host>
       - DAEMON_PORT=28081
+      - USE_TORSOCKS=NO
+      - USE_TOR=NO
     logging:
       driver: "json-file"
       options:
