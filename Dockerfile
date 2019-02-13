@@ -100,6 +100,8 @@ RUN apt-get update -qq && apt-get install -y \
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
+# Copy Tor configuration files after installing Tor apps
+# otherwise configuration might be replaced, build might stop
 COPY torsocks.conf /etc/tor/torsocks.conf
 COPY torrc /etc/tor/torrc
 
