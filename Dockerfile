@@ -100,14 +100,18 @@ RUN apt-get update -qq && apt-get install -y \
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
+# Copy Tor configuration files after installing Tor apps
+# otherwise configuration might be replaced, build might stop
 COPY torsocks.conf /etc/tor/torsocks.conf
+COPY torrc /etc/tor/torrc
 
 WORKDIR /monero
 
 RUN monerod --version > /version.txt \
     && cat /etc/os-release > /system.txt \
     && ldd $(command -v monerod) > /dependencies.txt \
-    && torsocks --version > /torsocks.txt
+    && torsocks --version > /torsocks.txt \
+    && tor --version > /tor.txt
 
 VOLUME ["/monero"]
 
@@ -120,5 +124,6 @@ ENV RPC_BIND_PORT 28081
 ENV P2P_BIND_IP 0.0.0.0
 ENV P2P_BIND_PORT 28080
 ENV USE_TORSOCKS NO
+ENV USE_TOR NO
 
 ENTRYPOINT ["/entrypoint.sh"]

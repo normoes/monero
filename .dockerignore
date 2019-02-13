@@ -2,3 +2,4 @@
 !Dockerfile
 !entrypoint.sh
 !torsocks.conf
+!torrc

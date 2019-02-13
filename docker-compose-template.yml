@@ -21,6 +21,8 @@ services:
       - LOG_LEVEL=0
       - RPC_BIND_IP=0.0.0.0
       - RPC_BIND_PORT=28081
+      - USE_TORSOCKS=NO
+      - USE_TOR=NO
     restart: unless-stopped
     logging:
       driver: "json-file"

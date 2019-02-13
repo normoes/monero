@@ -1,0 +1,13 @@
+RunAsDaemon 1
+User debian-tor
+SOCKSPort 0.0.0.0:9050
+## comment for local use with e.g. curl
+# SOCKSPolicy "reject *"
+
+HiddenServiceDir /var/lib/tor/daemons/
+HiddenServicePort 18081 127.0.0.1:18081
+HiddenServicePort 28081 127.0.0.1:28081
+HiddenServicePort 38081 127.0.0.1:38081
+
+DataDirectory /var/lib/tor
+Log notice file /var/log/tor/notices.log

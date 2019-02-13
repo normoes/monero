@@ -52,6 +52,8 @@ You can find the following information within the docker image:
   - `-e DAEMON_PORT=18081` (assuming daemon listens on port `18081`)
 * Using `monerod`, `monero-wallet-rpc` and `monero-wallet-cli` with `torsocks`:
   - `-e USE_TORSOCKS=YES` (**default**: `NO`)
+* Running the Tor proxy (`tor`) within the container:
+  - `-e USE_TOR=YES` (**default**: `NO`)
 
 ### hint:
 * The IPs, the daemon or RPC are binding to, need to be `0.0.0.0` instead of `127.0.0.1` within a docker container.
@@ -132,7 +134,7 @@ When used as `monero-wallet-cli` the full command is necessary as command to doc
 docker run --rm -it -e DAEMON_HOST=node.xmr.to -e DAEMON_PORT=18081 -v <path/to/and/including/wallet_folder>:/monero --net host xmrto/monero monero-wallet-cli --wallet-file wallet --password-file wallet.passwd
 ```
 
-Attaching to the container then allows you to use `monero-wallet-cli` commands.
+Due to `-it` (interactive terminal), you will end up within the container and can use the `monero-wallet-cli` commands.
 
 ### user
 Run `monero-wallet-cli` as different user (`uid != 1000 && uid != 0`). This is useful if deployed to several systems (AWS ec2-user: `uid=500`).
@@ -150,36 +152,19 @@ The path `/monero` is supposed to contain the actual wallet files. So when mount
 
 Additional software installed:
 * `torsocks`
+* `tor`
 
 You can find the following information within the docker image:
 * `/torsocks.txt` contains output of `torsocks --version`
-
-### using the Tor proxy
-There are two options:
-* a single container containing monero and Tor proxy,
-* sparate containers for monero and Tor proxy.
-
-#### single image including the Tor proxy
-There is a [monero docker image incl. the tor proxy](https://github.com/XMRto/monero/blob/tor/Dockerfile).
-Please also refer to [xmrto/tor](https://hub.docker.com/r/xmrto/tor) for further details.
-
-In this case the monero daemon ports available in the clearnet, are forwarded by the Tor proxy into the Tor network.
-
-Against docker best practices (1 service per container), this **monero tor docker image** bundles monero tools with the Tor proxy witihn a single docker image.
-
-#### separate images
-The previous case can be separated, so the monero tools and the Tor proxy run in separate containers (from separate images).
-
-Please also refer to [xmrto/tor](https://hub.docker.com/r/xmrto/tor) for further details.
+* `/tor.txt` contains output of `tor --version`
 
 ### using torsocks
-Every monero docker image also contains `torsocks`.
+Every monero docker image comes with `torsocks`.
 
-To start `monerod`, `monero-wallet-rpc` and `monero-wallet-cli` using `torsocks`,the environment variable `USE_TORSOCKS=YES` should be passed into the container.
+To start `monerod`, `monero-wallet-rpc` and `monero-wallet-cli` using `torsocks`, the environment variable `USE_TORSOCKS=YES` should be passed into the container.
+In case you use an external Tor proxy, you should run the monero docker container with `--net host` (docker cli) or `network_mode: "host"` (docker-compose), in order to make the host's localhost (and hence the external Tor proxy port) available to `torsocks` - provided the Tor proxy runs on the host's localhost. Please see below.
 
-This allows, similar to the previous case, to make monero tools available in Tor network.
-
-The following configuraion file `torsocks.conf` is used:
+The following configuraion file `/etc/tor/torsocks.conf` is used:
 
 ```
 TorAddress 127.0.0.1
@@ -191,3 +176,72 @@ AllowInbound 1
 ```
 
 The option `AllowInbound` is set to `1`, in order to allow binding the monero daemon to all interfaces (`0.0.0.0`) - within docker containers.
+
+Please also refer to [xmrto/tor](https://hub.docker.com/r/xmrto/tor) for further details.
+
+### using the Tor proxy
+There are two options:
+* a single container containing monero and Tor proxy,
+* sparate containers for monero and Tor proxy.
+
+Generally it is more recommended to have one single process within a docker container. separate containers
+
+#### single image including the Tor proxy
+Every monero docker image comes with `tor`.
+
+The `tor` proxy is started within the docker image, when the environment variable `USE_TOR=YES` is set.
+
+Against docker best practices (1 service per container), this **monero tor docker image** bundles monero tools with the Tor proxy witihn a single docker image.
+
+The following configuraion file `/etc/tor/torrc` is used:
+
+```
+RunAsDaemon 1
+User debian-tor
+SOCKSPort 0.0.0.0:9050
+## comment for local use with e.g. curl
+# SOCKSPolicy "reject *"
+
+HiddenServiceDir /var/lib/tor/daemons/
+HiddenServicePort 18081 127.0.0.1:18081
+HiddenServicePort 28081 127.0.0.1:28081
+HiddenServicePort 38081 127.0.0.1:38081
+
+DataDirectory /var/lib/tor
+Log notice file /var/log/tor/notices.log
+
+```
+In this case the monero daemon ports available in the clearnet, are forwarded by the Tor proxy into the Tor network.
+The option `SOCKSPort` is bound to `0.0.0.0` (all interfaces), in order to make it run within the docker container.
+The option `HiddenServiceDir /var/lib/tor/daemons/` can be used as docker volume to provide teh files `hostname` and `private_key`.
+
+After starting the docker container you will find your hostname (**.onion address**) here:
+
+`docker exec <container_name> cat /var/lib/tor/daemons/hostname`
+
+Please also refer to [xmrto/tor](https://hub.docker.com/r/xmrto/tor) for further details.
+
+#### separate images
+The monero tools and the Tor proxy can also be run in separate containers (from separate images or processes on the host).
+
+In this case, you need to make the host's localhost available within the monero docker container - see above **using torsocks**.
+
+Please also refer to [xmrto/tor](https://hub.docker.com/r/xmrto/tor) for further details.
+
+### docker container configuration examples
+
+* serve `monerod` in the Tor network
+  - `USE_TOR=YES`
+  - `USE_TORSOCKS=NO`
+  - Check tor configuration
+  - Consider using `SOCKSPolicy "reject *"`
+* run `monero-wallet-rpc` or `monero-wallet-cli` over the Tor network
+  - running Tor proxy contained in the image
+    + `USE_TOR=YES`
+    + `USE_TORSOCKS=YES`
+  - running an external Tor proxy
+    + `USE_TOR=NO`
+    + `USE_TORSOCKS=YES`
+  - Check tor configuration
+
+Please also refer to [xmrto/tor](https://hub.docker.com/r/xmrto/tor) for further details.
