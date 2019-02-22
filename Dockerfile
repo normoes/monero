@@ -25,10 +25,8 @@ RUN apt-get update -qq && apt-get -y install \
     && cd /usr/src/gtest \
     && cmake . \
     && make \
-    && mv libg* /usr/lib/
-
-
-RUN cd /data \
+    && mv libg* /usr/lib/ \
+    && cd /data \
     && git clone https://github.com/ncopa/su-exec.git su-exec-clone \
     && cd su-exec-clone \
     && make \
@@ -45,17 +43,16 @@ ARG BRANCH
 ARG BUILD_PATH=/monero/build/release/bin
 
 RUN cd /data \
-    && git clone -b "$BRANCH" --single-branch --depth 1 --recursive $MONERO_URL
-RUN cd monero \
+    && git clone -b "$BRANCH" --single-branch --depth 1 --recursive $MONERO_URL \
+    && cd monero \
     && USE_SINGLE_BUILDDIR=1 make \
     && mv /data$BUILD_PATH/monerod /data/ \
     && chmod +x /data/monerod \
     && mv /data$BUILD_PATH/monero-wallet-rpc /data/ \
     && chmod +x /data/monero-wallet-rpc \
     && mv /data$BUILD_PATH/monero-wallet-cli /data/ \
-    && chmod +x /data/monero-wallet-cli
-
-RUN apt-get purge -y \
+    && chmod +x /data/monero-wallet-cli \
+    && apt-get purge -y \
         build-essential \
         cmake \
         libboost-all-dev \
