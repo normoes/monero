@@ -27,8 +27,8 @@ RUN apt-get update -qq && apt-get -y install \
     && make \
     && mv libg* /usr/lib/ \
     && cd /data \
-    && git clone https://github.com/ncopa/su-exec.git su-exec-clone \
-    && cd su-exec-clone \
+    && git clone --single-branch --depth 1 https://github.com/ncopa/su-exec.git su-exec.git \
+    && cd su-exec.git \
     && make \
     && cp su-exec /data
 
@@ -40,11 +40,11 @@ RUN apt-get update -qq && apt-get -y install \
 
 ARG MONERO_URL=https://github.com/monero-project/monero.git
 ARG BRANCH
-ARG BUILD_PATH=/monero/build/release/bin
+ARG BUILD_PATH=/monero.git/build/release/bin
 
 RUN cd /data \
-    && git clone -b "$BRANCH" --single-branch --depth 1 --recursive $MONERO_URL \
-    && cd monero \
+    && git clone --branch "$BRANCH" --single-branch --depth 1 --recursive $MONERO_URL monero.git \
+    && cd monero.git \
     && USE_SINGLE_BUILDDIR=1 make \
     && mv /data$BUILD_PATH/monerod /data/ \
     && chmod +x /data/monerod \
@@ -74,8 +74,8 @@ RUN cd /data \
     && apt-get autoremove --purge -y \
     && apt-get clean \
     && rm -rf /var/tmp/* /tmp/* /var/lib/apt \
-    && rm -rf /data/monero \
-    && rm -rf /data/su-exec-clone
+    && rm -rf /data/monero.git \
+    && rm -rf /data/su-exec.git
 
 # /var/lib/apt/lists/* \
 
