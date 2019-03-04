@@ -1,7 +1,6 @@
 #!/bin/bash
 
-#BRANCH="master"
-BRANCH="release-v0.13"
+BRANCH="master"
 if [ -z "$BRANCH" ];then
   echo "no branch could be found."
   exit 1
