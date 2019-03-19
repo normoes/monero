@@ -49,6 +49,10 @@ ARG HIDAPI_HASH=40cf516139b5b61e30d9403a48db23d8f915f52c
 ARG PROTOBUF_VERSION=v3.7.0
 ARG PROTOBUF_HASH=582743bf40c5d3639a70f98f183914a2c0cd0680
 
+ENV CFLAGS='-fPIC -O2 -g'
+ENV CXXFLAGS='-fPIC -O2 -g'
+ENV LDFLAGS='-static-libstdc++'
+
 RUN echo "\e[32mbuilding: $PROJECT_URL on branch: $BRANCH\e[39m" \
     && apt-get update -qq && apt-get --no-install-recommends -yqq install \
         ca-certificates \
@@ -93,7 +97,7 @@ RUN echo "\e[32mbuilding: $PROJECT_URL on branch: $BRANCH\e[39m" \
     && tar -xvf boost_${BOOST_VERSION}.tar.bz2 > /dev/null \
     && cd boost_${BOOST_VERSION} \
     && ./bootstrap.sh > /dev/null \
-    && ./b2 --build-type=minimal link=static runtime-link=static --with-chrono --with-date_time --with-filesystem --with-program_options --with-regex --with-serialization --with-system --with-thread --with-locale threading=multi threadapi=pthread cflags="-fPIC -O2 -g" cxxflags="-fPIC -O2 -g" stage > /dev/null \
+    && ./b2 --build-type=minimal link=static runtime-link=static --with-chrono --with-date_time --with-filesystem --with-program_options --with-regex --with-serialization --with-system --with-thread --with-locale threading=multi threadapi=pthread cflags="$CFLAGS" cxxflags="$CXXFLAGS" stage > /dev/null \
     && cd /data \
     && echo "\e[32mbuilding: Openssl\e[39m" \
     && set -ex \
@@ -101,7 +105,8 @@ RUN echo "\e[32mbuilding: $PROJECT_URL on branch: $BRANCH\e[39m" \
     && echo "${OPENSSL_HASH}  openssl-${OPENSSL_VERSION}.tar.gz" | sha256sum -c \
     && tar -xzf openssl-${OPENSSL_VERSION}.tar.gz > /dev/null \
     && cd openssl-${OPENSSL_VERSION} \
-    && ./Configure linux-x86_64 no-shared --static -fPIC -O2 -g > /dev/null \
+#     && ./Configure linux-x86_64 no-shared --static -fPIC -O2 -g > /dev/null \
+    && ./Configure linux-x86_64 no-shared --static "$CFLAGS" > /dev/null \
     && make build_generated > /dev/null \
     && make libcrypto.a > /dev/null \
     && make install > /dev/null \
@@ -112,7 +117,7 @@ RUN echo "\e[32mbuilding: $PROJECT_URL on branch: $BRANCH\e[39m" \
     && cd libzmq \
     && test `git rev-parse HEAD` = ${ZMQ_HASH} || exit 1 \
     && ./autogen.sh > /dev/null \
-    && LDFLAGS='-static-libstdc++' CFLAGS="-fPIC -O2 -g" CXXFLAGS="-fPIC -O2 -g" ./configure --enable-libunwind=no --enable-static --disable-shared \
+    && ./configure --enable-libunwind=no --enable-static --disable-shared > /dev/null \
     && make -j4 > /dev/null \
     && make install > /dev/null \
     && ldconfig > /dev/null \
@@ -130,7 +135,7 @@ RUN echo "\e[32mbuilding: $PROJECT_URL on branch: $BRANCH\e[39m" \
     && echo "${READLINE_HASH}  readline-${READLINE_VERSION}.tar.gz" | sha256sum -c \
     && tar -xzf readline-${READLINE_VERSION}.tar.gz > /dev/null \
     && cd readline-${READLINE_VERSION} \
-    && CFLAGS="-fPIC -O2 -g" CXXFLAGS="-fPIC -O2 -g" ./configure > /dev/null \
+    && ./configure > /dev/null \
     && make -j4 > /dev/null \
     && make install > /dev/null \
     && cd /data \
@@ -140,7 +145,7 @@ RUN echo "\e[32mbuilding: $PROJECT_URL on branch: $BRANCH\e[39m" \
     && cd libsodium \
     && test `git rev-parse HEAD` = ${SODIUM_HASH} || exit 1 \
     && ./autogen.sh \
-    && CFLAGS="-fPIC -O2 -g" CXXFLAGS="-fPIC -O2 -g" ./configure \
+    && ./configure > /dev/null \
     && make -j4 > /dev/null \
     && make check > /dev/null \
     && make install > /dev/null \
@@ -151,7 +156,7 @@ RUN echo "\e[32mbuilding: $PROJECT_URL on branch: $BRANCH\e[39m" \
     && cd eudev \
     && test `git rev-parse HEAD` = ${UDEV_HASH} || exit 1 \
     && ./autogen.sh \
-    && CFLAGS="-fPIC -O2 -g" CXXFLAGS="-fPIC -O2 -g" ./configure --disable-gudev --disable-introspection --disable-hwdb --disable-manpages --disable-shared \
+    && ./configure --disable-gudev --disable-introspection --disable-hwdb --disable-manpages --disable-shared > /dev/null \
     && make -j4 > /dev/null \
     && make install > /dev/null \
     && cd /data \
@@ -161,7 +166,7 @@ RUN echo "\e[32mbuilding: $PROJECT_URL on branch: $BRANCH\e[39m" \
     && cd libusb \
     && test `git rev-parse HEAD` = ${USB_HASH} || exit 1 \
     && ./autogen.sh \
-    && CFLAGS="-fPIC -O2 -g" CXXFLAGS="-fPIC -O2 -g" ./configure --disable-shared \
+    && ./configure --disable-shared > /dev/null \
     && make -j4 > /dev/null \
     && make install > /dev/null \
     && cd /data \
@@ -171,7 +176,7 @@ RUN echo "\e[32mbuilding: $PROJECT_URL on branch: $BRANCH\e[39m" \
     && cd hidapi \
     && test `git rev-parse HEAD` = ${HIDAPI_HASH} || exit 1 \
     && ./bootstrap \
-    && CFLAGS="-fPIC -O2 -g" CXXFLAGS="-fPIC -O2 -g" ./configure --enable-static --disable-shared \
+    && ./configure --enable-static --disable-shared > /dev/null \
     && make -j4 > /dev/null \
     && make install > /dev/null \
     && cd /data \
@@ -182,7 +187,7 @@ RUN echo "\e[32mbuilding: $PROJECT_URL on branch: $BRANCH\e[39m" \
     && test `git rev-parse HEAD` = ${PROTOBUF_HASH} || exit 1 \
     && git submodule update --init --recursive > /dev/null \
     && ./autogen.sh > /dev/null \
-    && CFLAGS="-fPIC -O2 -g" CXXFLAGS="-fPIC -O2 -g" ./configure --enable-static --disable-shared \
+    && ./configure --enable-static --disable-shared > /dev/null \
     && make -j4 > /dev/null \
     && make install > /dev/null \
     && ldconfig \
