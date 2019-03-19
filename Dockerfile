@@ -2,82 +2,226 @@ FROM debian:stable-slim as builder
 
 WORKDIR /data
 
-RUN apt-get update -qq && apt-get -y install \
-        build-essential \
+# BUILD_PATH:
+# Using 'USE_SINGLE_BUILDDIR=1 make' creates a unified build dir (/monero.git/build/release/bin)
+
+ARG PROJECT_URL=https://github.com/monero-project/monero.git
+ARG BRANCH=master
+ARG BUILD_PATH=/monero.git/build/release/bin
+#su-exec
+ARG SUEXEC_VERSION=v0.2
+ARG SUEXEC_HASH=f85e5bde1afef399021fbc2a99c837cf851ceafa
+#Cmake
+ARG CMAKE_VERSION=3.14.0
+ARG CMAKE_VERSION_DOT=v3.14
+ARG CMAKE_HASH=aa76ba67b3c2af1946701f847073f4652af5cbd9f141f221c97af99127e75502
+## Boost
+ARG BOOST_VERSION=1_69_0
+ARG BOOST_VERSION_DOT=1.69.0
+ARG BOOST_HASH=8f32d4617390d1c2d16f26a27ab60d97807b35440d45891fa340fc2648b04406
+ENV BOOST_ROOT /usr/local/boost_${BOOST_VERSION}
+# OpenSSL
+ARG OPENSSL_VERSION=1.1.1b
+ARG OPENSSL_HASH=5c557b023230413dfb0756f3137a13e6d726838ccd1430888ad15bfb2b43ea4b
+ENV OPENSSL_ROOT_DIR=/usr/local/openssl-${OPENSSL_VERSION}
+# ZMQ
+ARG ZMQ_VERSION=v4.3.1
+ARG ZMQ_HASH=2cb1240db64ce1ea299e00474c646a2453a8435b
+# zmq.hpp
+ARG CPPZMQ_VERSION=v4.3.0
+ARG CPPZMQ_HASH=213da0b04ae3b4d846c9abc46bab87f86bfb9cf4
+# Readline
+ARG READLINE_VERSION=8.0
+ARG READLINE_HASH=e339f51971478d369f8a053a330a190781acb9864cf4c541060f12078948e461
+# Sodium
+ARG SODIUM_VERSION=1.0.17
+ARG SODIUM_HASH=b732443c442239c2e0184820e9b23cca0de0828c
+# Udev
+ARG UDEV_VERSION=v3.2.7
+ARG UDEV_HASH=4758e346a14126fc3a964de5831e411c27ebe487
+# Libusb
+ARG USB_VERSION=v1.0.22
+ARG USB_HASH=0034b2afdcdb1614e78edaa2a9e22d5936aeae5d
+# Hidapi
+ARG HIDAPI_VERSION=hidapi-0.8.0-rc1
+ARG HIDAPI_HASH=40cf516139b5b61e30d9403a48db23d8f915f52c
+# Protobuf
+ARG PROTOBUF_VERSION=v3.7.0
+ARG PROTOBUF_HASH=582743bf40c5d3639a70f98f183914a2c0cd0680
+
+RUN echo "\e[32mbuilding: $PROJECT_URL on branch: $BRANCH\e[39m" \
+    && apt-get update -qq && apt-get --no-install-recommends -yqq install \
+        ca-certificates \
         cmake \
+        g++ \
+        make \
         pkg-config \
         libboost-all-dev \
-        libssl-dev \
-        libzmq3-dev \
-        libpgm-dev \
-        libunbound-dev \
-        libsodium-dev \
-        libunwind8-dev \
-        liblzma-dev \
-        libreadline6-dev \
-        libldns-dev \
-        libexpat1-dev \
-        doxygen \
         graphviz \
-        libpcsclite-dev \
-        libgtest-dev \
+        doxygen \
         git \
-    && cd /usr/src/gtest \
-    && cmake . \
-    && make \
-    && mv libg* /usr/lib/ \
+        curl \
+        libtool-bin \
+        autoconf \
+        automake \
+        bzip2 \
+        xsltproc \
+        gperf \
+        unzip > /dev/null \
     && cd /data \
-    && git clone --single-branch --depth 1 https://github.com/ncopa/su-exec.git su-exec.git \
+    && echo "\e[32mbuilding: su-exec\e[39m" \
+    && git clone --branch ${SUEXEC_VERSION} --single-branch --depth 1 https://github.com/ncopa/su-exec.git su-exec.git > /dev/null \
     && cd su-exec.git \
-    && make \
-    && cp su-exec /data
-
-# BUILD_PATH:
-# v0.12.3.0: /monero/build/release/bin
-# v0.13.0.1-RC1: /monero/build/Linux/_no_branch_/release/bin
-# master:    /monero/build/Linux/master/release/bin
-# Using 'USE_SINGLE_BUILDDIR=1 make' creates a unified build dir (/monero/build/release/bin)
-
-ARG MONERO_URL=https://github.com/monero-project/monero.git
-ARG BRANCH
-ARG BUILD_PATH=/monero.git/build/release/bin
-
-RUN cd /data \
-    && git clone --branch "$BRANCH" --single-branch --depth 1 --recursive $MONERO_URL monero.git \
+    && test `git rev-parse HEAD` = ${SUEXEC_HASH} || exit 1 \
+    && make -j4 > /dev/null \
+    && cp su-exec /data \
+    && cd /data \
+    && echo "\e[32mbuilding: Cmake\e[39m" \
+    && set -ex \
+    && curl -s -O https://cmake.org/files/${CMAKE_VERSION_DOT}/cmake-${CMAKE_VERSION}.tar.gz > /dev/null \
+    && echo "${CMAKE_HASH}  cmake-${CMAKE_VERSION}.tar.gz" | sha256sum -c \
+    && tar -xzf cmake-${CMAKE_VERSION}.tar.gz > /dev/null \
+    && cd cmake-${CMAKE_VERSION} \
+    && ./configure > /dev/null \
+    && make -j4 > /dev/null \
+    && make install > /dev/null \
+    && cd /data \
+    && echo "\e[32mbuilding: Boost\e[39m" \
+    && set -ex \
+    && curl -s -L -o  boost_${BOOST_VERSION}.tar.bz2 https://dl.bintray.com/boostorg/release/${BOOST_VERSION_DOT}/source/boost_${BOOST_VERSION}.tar.bz2 > /dev/null \
+    && echo "${BOOST_HASH}  boost_${BOOST_VERSION}.tar.bz2" | sha256sum -c \
+    && tar -xvf boost_${BOOST_VERSION}.tar.bz2 > /dev/null \
+    && cd boost_${BOOST_VERSION} \
+    && ./bootstrap.sh > /dev/null \
+    && ./b2 --build-type=minimal link=static runtime-link=static --with-chrono --with-date_time --with-filesystem --with-program_options --with-regex --with-serialization --with-system --with-thread --with-locale threading=multi threadapi=pthread cflags="-fPIC -O2 -g" cxxflags="-fPIC -O2 -g" stage > /dev/null \
+    && cd /data \
+    && echo "\e[32mbuilding: Openssl\e[39m" \
+    && set -ex \
+    && curl -s -O https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz > /dev/null \
+    && echo "${OPENSSL_HASH}  openssl-${OPENSSL_VERSION}.tar.gz" | sha256sum -c \
+    && tar -xzf openssl-${OPENSSL_VERSION}.tar.gz > /dev/null \
+    && cd openssl-${OPENSSL_VERSION} \
+    && ./Configure linux-x86_64 no-shared --static -fPIC -O2 -g > /dev/null \
+    && make build_generated > /dev/null \
+    && make libcrypto.a > /dev/null \
+    && make install > /dev/null \
+    && cd /data \
+    && echo "\e[32mbuilding: ZMQ\e[39m" \
+    && set -ex \
+    && git clone --branch ${ZMQ_VERSION} --single-branch --depth 1 https://github.com/zeromq/libzmq.git > /dev/null \
+    && cd libzmq \
+    && test `git rev-parse HEAD` = ${ZMQ_HASH} || exit 1 \
+    && ./autogen.sh > /dev/null \
+    && LDFLAGS='-static-libstdc++' CFLAGS="-fPIC -O2 -g" CXXFLAGS="-fPIC -O2 -g" ./configure --enable-libunwind=no --enable-static --disable-shared \
+    && make -j4 > /dev/null \
+    && make install > /dev/null \
+    && ldconfig > /dev/null \
+    && cd /data \
+    && echo "\e[32mbuilding: zmq.hpp\e[39m" \
+    && set -ex \
+    && git clone --branch ${CPPZMQ_VERSION} --single-branch --depth 1 https://github.com/zeromq/cppzmq.git > /dev/null \
+    && cd cppzmq \
+    && test `git rev-parse HEAD` = ${CPPZMQ_HASH} || exit 1 \
+    && mv *.hpp /usr/local/include \
+    && cd /data \
+    && echo "\e[32mbuilding: Readline\e[39m" \
+    && set -ex \
+    && curl -s -O https://ftp.gnu.org/gnu/readline/readline-${READLINE_VERSION}.tar.gz > /dev/null \
+    && echo "${READLINE_HASH}  readline-${READLINE_VERSION}.tar.gz" | sha256sum -c \
+    && tar -xzf readline-${READLINE_VERSION}.tar.gz > /dev/null \
+    && cd readline-${READLINE_VERSION} \
+    && CFLAGS="-fPIC -O2 -g" CXXFLAGS="-fPIC -O2 -g" ./configure > /dev/null \
+    && make -j4 > /dev/null \
+    && make install > /dev/null \
+    && cd /data \
+    && echo "\e[32mbuilding: Sodium\e[39m" \
+    && set -ex \
+    && git clone --branch ${SODIUM_VERSION} --single-branch --depth 1 https://github.com/jedisct1/libsodium.git > /dev/null \
+    && cd libsodium \
+    && test `git rev-parse HEAD` = ${SODIUM_HASH} || exit 1 \
+    && ./autogen.sh \
+    && CFLAGS="-fPIC -O2 -g" CXXFLAGS="-fPIC -O2 -g" ./configure \
+    && make -j4 > /dev/null \
+    && make check > /dev/null \
+    && make install > /dev/null \
+    && cd /data \
+    && echo "\e[32mbuilding: Udev\e[39m" \
+    && set -ex \
+    && git clone --branch ${UDEV_VERSION} --single-branch --depth 1 https://github.com/gentoo/eudev > /dev/null \
+    && cd eudev \
+    && test `git rev-parse HEAD` = ${UDEV_HASH} || exit 1 \
+    && ./autogen.sh \
+    && CFLAGS="-fPIC -O2 -g" CXXFLAGS="-fPIC -O2 -g" ./configure --disable-gudev --disable-introspection --disable-hwdb --disable-manpages --disable-shared \
+    && make -j4 > /dev/null \
+    && make install > /dev/null \
+    && cd /data \
+    && echo "\e[32mbuilding: Libusb\e[39m" \
+    && set -ex \
+    && git clone --branch ${USB_VERSION} --single-branch --depth 1 https://github.com/libusb/libusb.git > /dev/null \
+    && cd libusb \
+    && test `git rev-parse HEAD` = ${USB_HASH} || exit 1 \
+    && ./autogen.sh \
+    && CFLAGS="-fPIC -O2 -g" CXXFLAGS="-fPIC -O2 -g" ./configure --disable-shared \
+    && make -j4 > /dev/null \
+    && make install > /dev/null \
+    && cd /data \
+    && echo "\e[32mbuilding: Hidapi\e[39m" \
+    && set -ex \
+    && git clone --branch ${HIDAPI_VERSION} --single-branch --depth 1 https://github.com/signal11/hidapi > /dev/null \
+    && cd hidapi \
+    && test `git rev-parse HEAD` = ${HIDAPI_HASH} || exit 1 \
+    && ./bootstrap \
+    && CFLAGS="-fPIC -O2 -g" CXXFLAGS="-fPIC -O2 -g" ./configure --enable-static --disable-shared \
+    && make -j4 > /dev/null \
+    && make install > /dev/null \
+    && cd /data \
+    && echo "\e[32mbuilding: Protobuf\e[39m" \
+    && set -ex \
+    && git clone --branch ${PROTOBUF_VERSION}  --single-branch --depth 1 https://github.com/protocolbuffers/protobuf > /dev/null \
+    && cd protobuf \
+    && test `git rev-parse HEAD` = ${PROTOBUF_HASH} || exit 1 \
+    && git submodule update --init --recursive > /dev/null \
+    && ./autogen.sh > /dev/null \
+    && CFLAGS="-fPIC -O2 -g" CXXFLAGS="-fPIC -O2 -g" ./configure --enable-static --disable-shared \
+    && make -j4 > /dev/null \
+    && make install > /dev/null \
+    && ldconfig \
+    && cd /data \
+    && echo "\e[32mcloning: $PROJECT_URL on branch: $BRANCH\e[39m" \
+    && git clone --branch "$BRANCH" --single-branch --depth 1 --recursive $PROJECT_URL monero.git > /dev/null \
     && cd monero.git \
-    && USE_SINGLE_BUILDDIR=1 make \
+    && echo "\e[32mbuilding static daemon\e[39m" \
+    && USE_SINGLE_BUILDDIR=1 make -j4 release-static > /dev/null \
+    && echo "\e[32mcopy and clean up\e[39m" \
     && mv /data$BUILD_PATH/monerod /data/ \
     && chmod +x /data/monerod \
     && mv /data$BUILD_PATH/monero-wallet-rpc /data/ \
     && chmod +x /data/monero-wallet-rpc \
     && mv /data$BUILD_PATH/monero-wallet-cli /data/ \
     && chmod +x /data/monero-wallet-cli \
-    && apt-get purge -y \
-        build-essential \
+    && apt-get purge -yqq \
         cmake \
         libboost-all-dev \
-        libssl-dev \
-        libzmq3-dev \
-        libpgm-dev \
-        libunbound-dev \
-        libsodium-dev \
-        libunwind8-dev \
-        liblzma-dev \
-        libreadline6-dev \
-        libldns-dev \
-        libexpat1-dev \
+        g++ \
         doxygen \
         graphviz \
-        libpcsclite-dev \
-        libgtest-dev \
         git \
-    && apt-get autoremove --purge -y \
-    && apt-get clean \
+        curl \
+        ca-certificates \
+        make \
+        pkg-config \
+        libtool-bin \
+        autoconf \
+        automake \
+        bzip2 \
+        xsltproc \
+        gperf \
+        unzip > /dev/null \
+    && apt-get autoremove --purge -yqq > /dev/null \
+    && apt-get clean > /dev/null \
     && rm -rf /var/tmp/* /tmp/* /var/lib/apt \
     && rm -rf /data/monero.git \
     && rm -rf /data/su-exec.git
-
-# /var/lib/apt/lists/* \
 
 FROM debian:stable-slim
 COPY --from=builder /data/monerod /usr/local/bin/
@@ -85,14 +229,12 @@ COPY --from=builder /data/monero-wallet-rpc /usr/local/bin/
 COPY --from=builder /data/monero-wallet-cli /usr/local/bin/
 COPY --from=builder /data/su-exec /usr/local/bin/
 
-RUN apt-get update -qq && apt-get install -y \
-        libboost-all-dev \
-        libzmq3-dev \
-        libunbound-dev \
-        libexpat1-dev \
+RUN apt-get update -qq && apt-get install -yqq --no-install-recommends \
+        # ca-certificates \
         torsocks \
-    && apt-get autoremove --purge -y \
-    && apt-get clean \
+        tor > /dev/null \
+    && apt-get autoremove --purge -yqq > /dev/null \
+    && apt-get clean > /dev/null \
     && rm -rf /var/tmp/* /tmp/* /var/lib/apt
 
 COPY entrypoint.sh /entrypoint.sh
@@ -116,6 +258,9 @@ ENV USER_ID 1000
 ENV LOG_LEVEL 0
 ENV DAEMON_HOST 127.0.0.1
 ENV DAEMON_PORT 28081
+ENV RPC_USER ""
+ENV RPC_PASSWD ""
+ENV RPC_LOGIN ""
 ENV RPC_BIND_IP 0.0.0.0
 ENV RPC_BIND_PORT 28081
 ENV P2P_BIND_IP 0.0.0.0
