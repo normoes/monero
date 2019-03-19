@@ -43,13 +43,7 @@ if [ "$(id -u)" = 0 ]; then
   # USER_ID defaults to 1000 (Dockerfile)
   adduser --system --group --uid "$USER_ID" --shell /bin/false monero &> /dev/null
 
-  if [ "$BLOCK" == "YES" ]; then
-    # /code/block-rate-notify.sh
-    chown -R monero:monero /code
-    exec su-exec monero $@ --block-rate-notify "/code/block-rate-notify.sh -b%b -t%t"
-    # exec su-exec monero $@ --block-rate-notify "b=%b t=%t /code/block-rate-notify.sh"
-  else
-    exec su-exec monero $@
+  exec su-exec monero $@
   fi
 fi
 
