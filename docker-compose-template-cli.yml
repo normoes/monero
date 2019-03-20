@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        BRANCH: v0.13.0.4
+        BRANCH: v0.14.0.2
     command: monero-wallet-cli --testnet --wallet-file wallet --password-file wallet.passwd
     volumes:
       - <path/to/and/including/wallet_folder>:/monero

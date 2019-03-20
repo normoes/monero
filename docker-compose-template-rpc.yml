@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        BRANCH: v0.13.0.4
+        BRANCH: v0.14.0.2
     command: monero-wallet-rpc --testnet --wallet-file wallet --password-file wallet.passwd --disable-rpc-login
     volumes:
       - <path/to/and/including/wallet_folder>:/monero
@@ -17,8 +17,12 @@ services:
       - LOG_LEVEL=0
       - DAEMON_HOST=<host>
       - DAEMON_PORT=28081
+      - RPC_USER=""
+      - RPC_PASSWD=""
       - RPC_BIND_IP=0.0.0.0
       - RPC_BIND_PORT=28083
+      - USE_TORSOCKS=NO
+      - USE_TOR=NO
     logging:
       driver: "json-file"
       options:

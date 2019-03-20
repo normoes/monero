@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        BRANCH: v0.13.0.4
+        BRANCH: v0.14.0.2
     command: --testnet --data-dir /monero --non-interactive
     volumes:
       # /monero in container should eventually contain the contents of the folder .bitmonero
@@ -19,6 +19,8 @@ services:
       - P2P_BIND_IP=0.0.0.0
       - P2P_BIND_PORT=28080
       - LOG_LEVEL=0
+      - RPC_USER=""
+      - RPC_PASSWD=""
       - RPC_BIND_IP=0.0.0.0
       - RPC_BIND_PORT=28081
       - USE_TORSOCKS=NO
