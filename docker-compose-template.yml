@@ -19,6 +19,8 @@ services:
       - P2P_BIND_IP=0.0.0.0
       - P2P_BIND_PORT=28080
       - LOG_LEVEL=0
+      - RPC_USER=""
+      - RPC_PASSWD=""
       - RPC_BIND_IP=0.0.0.0
       - RPC_BIND_PORT=28081
       - USE_TORSOCKS=NO
