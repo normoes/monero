@@ -80,6 +80,7 @@ RUN echo "\e[32mbuilding: $PROJECT_URL on branch: $BRANCH\e[39m" \
     && make -j4 > /dev/null \
     && cp su-exec /data \
     && cd /data \
+    && rm -rf /data/su-exec.git \
     && echo "\e[32mbuilding: Cmake\e[39m" \
     && set -ex \
     && curl -s -O https://cmake.org/files/${CMAKE_VERSION_DOT}/cmake-${CMAKE_VERSION}.tar.gz > /dev/null \
@@ -90,6 +91,8 @@ RUN echo "\e[32mbuilding: $PROJECT_URL on branch: $BRANCH\e[39m" \
     && make -j4 > /dev/null \
     && make install > /dev/null \
     && cd /data \
+    && rm -rf /data/cmake-${CMAKE_VERSION} \
+    && rm -rf /data/cmake-${CMAKE_VERSION}.tar.gz \
     && echo "\e[32mbuilding: Boost\e[39m" \
     && set -ex \
     && curl -s -L -o  boost_${BOOST_VERSION}.tar.bz2 https://dl.bintray.com/boostorg/release/${BOOST_VERSION_DOT}/source/boost_${BOOST_VERSION}.tar.bz2 > /dev/null \
@@ -99,6 +102,8 @@ RUN echo "\e[32mbuilding: $PROJECT_URL on branch: $BRANCH\e[39m" \
     && ./bootstrap.sh > /dev/null \
     && ./b2 --build-type=minimal link=static runtime-link=static --with-chrono --with-date_time --with-filesystem --with-program_options --with-regex --with-serialization --with-system --with-thread --with-locale threading=multi threadapi=pthread cflags="$CFLAGS" cxxflags="$CXXFLAGS" stage > /dev/null \
     && cd /data \
+    && rm -rf /data/boost_${BOOST_VERSION} \
+    && rm -rf /data/boost_${BOOST_VERSION}.tar.bz2 \
     && echo "\e[32mbuilding: Openssl\e[39m" \
     && set -ex \
     && curl -s -O https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz > /dev/null \
@@ -111,6 +116,8 @@ RUN echo "\e[32mbuilding: $PROJECT_URL on branch: $BRANCH\e[39m" \
     && make libcrypto.a > /dev/null \
     && make install > /dev/null \
     && cd /data \
+    && rm -rf /data/openssl-${OPENSSL_VERSION} \
+    && rm -rf /data/openssl-${OPENSSL_VERSION}.tar.gz \
     && echo "\e[32mbuilding: ZMQ\e[39m" \
     && set -ex \
     && git clone --branch ${ZMQ_VERSION} --single-branch --depth 1 https://github.com/zeromq/libzmq.git > /dev/null \
@@ -122,6 +129,7 @@ RUN echo "\e[32mbuilding: $PROJECT_URL on branch: $BRANCH\e[39m" \
     && make install > /dev/null \
     && ldconfig > /dev/null \
     && cd /data \
+    && rm -rf /data/libzmq \
     && echo "\e[32mbuilding: zmq.hpp\e[39m" \
     && set -ex \
     && git clone --branch ${CPPZMQ_VERSION} --single-branch --depth 1 https://github.com/zeromq/cppzmq.git > /dev/null \
@@ -129,6 +137,7 @@ RUN echo "\e[32mbuilding: $PROJECT_URL on branch: $BRANCH\e[39m" \
     && test `git rev-parse HEAD` = ${CPPZMQ_HASH} || exit 1 \
     && mv *.hpp /usr/local/include \
     && cd /data \
+    && rm -rf /data/cppzmq \
     && echo "\e[32mbuilding: Readline\e[39m" \
     && set -ex \
     && curl -s -O https://ftp.gnu.org/gnu/readline/readline-${READLINE_VERSION}.tar.gz > /dev/null \
@@ -139,6 +148,8 @@ RUN echo "\e[32mbuilding: $PROJECT_URL on branch: $BRANCH\e[39m" \
     && make -j4 > /dev/null \
     && make install > /dev/null \
     && cd /data \
+    && rm -rf /data/readline-${READLINE_VERSION} \
+    && rm -rf readline-${READLINE_VERSION}.tar.gz \
     && echo "\e[32mbuilding: Sodium\e[39m" \
     && set -ex \
     && git clone --branch ${SODIUM_VERSION} --single-branch --depth 1 https://github.com/jedisct1/libsodium.git > /dev/null \
@@ -150,6 +161,7 @@ RUN echo "\e[32mbuilding: $PROJECT_URL on branch: $BRANCH\e[39m" \
     && make check > /dev/null \
     && make install > /dev/null \
     && cd /data \
+    && rm -rf /data/libsodium \
     && echo "\e[32mbuilding: Udev\e[39m" \
     && set -ex \
     && git clone --branch ${UDEV_VERSION} --single-branch --depth 1 https://github.com/gentoo/eudev > /dev/null \
@@ -160,6 +172,7 @@ RUN echo "\e[32mbuilding: $PROJECT_URL on branch: $BRANCH\e[39m" \
     && make -j4 > /dev/null \
     && make install > /dev/null \
     && cd /data \
+    && rm -rf /data/eudev \
     && echo "\e[32mbuilding: Libusb\e[39m" \
     && set -ex \
     && git clone --branch ${USB_VERSION} --single-branch --depth 1 https://github.com/libusb/libusb.git > /dev/null \
@@ -170,6 +183,7 @@ RUN echo "\e[32mbuilding: $PROJECT_URL on branch: $BRANCH\e[39m" \
     && make -j4 > /dev/null \
     && make install > /dev/null \
     && cd /data \
+    && rm -rf /data/libusb \
     && echo "\e[32mbuilding: Hidapi\e[39m" \
     && set -ex \
     && git clone --branch ${HIDAPI_VERSION} --single-branch --depth 1 https://github.com/signal11/hidapi > /dev/null \
@@ -180,6 +194,7 @@ RUN echo "\e[32mbuilding: $PROJECT_URL on branch: $BRANCH\e[39m" \
     && make -j4 > /dev/null \
     && make install > /dev/null \
     && cd /data \
+    && rm -rf /data/hidapi \
     && echo "\e[32mbuilding: Protobuf\e[39m" \
     && set -ex \
     && git clone --branch ${PROTOBUF_VERSION}  --single-branch --depth 1 https://github.com/protocolbuffers/protobuf > /dev/null \
@@ -192,8 +207,9 @@ RUN echo "\e[32mbuilding: $PROJECT_URL on branch: $BRANCH\e[39m" \
     && make install > /dev/null \
     && ldconfig \
     && cd /data \
+    && rm -rf /data/protobuf \
     && echo "\e[32mcloning: $PROJECT_URL on branch: $BRANCH\e[39m" \
-    && git clone --branch "$BRANCH" --single-branch --depth 1 --recursive $PROJECT_URL monero.git > /dev/null \
+    && git clone --branch "$BRANCH" --single-branch --recursive $PROJECT_URL monero.git > /dev/null \
     && cd monero.git \
     && echo "\e[32mbuilding static daemon\e[39m" \
     && USE_SINGLE_BUILDDIR=1 make -j4 release-static > /dev/null \
@@ -204,6 +220,8 @@ RUN echo "\e[32mbuilding: $PROJECT_URL on branch: $BRANCH\e[39m" \
     && chmod +x /data/monero-wallet-rpc \
     && mv /data$BUILD_PATH/monero-wallet-cli /data/ \
     && chmod +x /data/monero-wallet-cli \
+    && cd /data \
+    && rm -rf /data/monero.git \
     && apt-get purge -yqq \
         cmake \
         libboost-all-dev \
@@ -224,9 +242,7 @@ RUN echo "\e[32mbuilding: $PROJECT_URL on branch: $BRANCH\e[39m" \
         unzip > /dev/null \
     && apt-get autoremove --purge -yqq > /dev/null \
     && apt-get clean > /dev/null \
-    && rm -rf /var/tmp/* /tmp/* /var/lib/apt \
-    && rm -rf /data/monero.git \
-    && rm -rf /data/su-exec.git
+    && rm -rf /var/tmp/* /tmp/* /var/lib/apt
 
 FROM debian:stable-slim
 COPY --from=builder /data/monerod /usr/local/bin/
