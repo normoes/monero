@@ -12,7 +12,6 @@ docker build \
   --pull \
   --target dependencies1 \
   --cache-from $DOCKER_REPO:dependencies1 \
-  --build-arg BRANCH=$BRANCH \
   -f ./Dockerfile \
   -t $DOCKER_REPO:dependencies1 .
 
@@ -25,11 +24,23 @@ docker build \
   --target dependencies2 \
   --cache-from $DOCKER_REPO:dependencies1 \
   --cache-from $DOCKER_REPO:dependencies2 \
-  --build-arg BRANCH=$BRANCH \
   -f ./Dockerfile \
   -t $DOCKER_REPO:dependencies2 .
 
 docker push $DOCKER_REPO:dependencies2
+
+docker pull $DOCKER_REPO:dependencies3 || true
+
+docker build \
+  --pull \
+  --target dependencies3 \
+  --cache-from $DOCKER_REPO:dependencies1 \
+  --cache-from $DOCKER_REPO:dependencies2 \
+  --cache-from $DOCKER_REPO:dependencies3 \
+  -f ./Dockerfile \
+  -t $DOCKER_REPO:dependencies3 .
+
+docker push $DOCKER_REPO:dependencies3
 
 docker pull $DOCKER_REPO:builder || true
 
@@ -38,6 +49,7 @@ docker build \
   --target builder \
   --cache-from $DOCKER_REPO:dependencies1 \
   --cache-from $DOCKER_REPO:dependencies2 \
+  --cache-from $DOCKER_REPO:dependencies3 \
   --cache-from $DOCKER_REPO:builder \
   --build-arg BRANCH=$BRANCH \
   -f ./Dockerfile \
@@ -54,4 +66,4 @@ docker build \
   --cache-from $IMAGE_NAME \
   --build-arg BRANCH=$BRANCH \
   -f ./Dockerfile \
-  -t $IMAGE_NAME:latest .
+  -t $IMAGE_NAME .

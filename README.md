@@ -46,6 +46,8 @@ You can find the following information within the docker image:
 * only `monero-wallet-rpc` and `monero-wallet-cli`  
   - `--daemon-host=$DAEMON_HOST` (**default**: `127.0.0.1`)
   - `--daemon-port=$DAEMON_PORT` (**default**: `28081`)
+  - `--password=$WALLET_PASSWD` (**default**: `""`)
+    + For **wallet password**, please see below.
 * Adapt default configuration using environment variables:
   - `-e LOG_LEVEL=3`
   - `-e RPC_USER=user`
@@ -67,7 +69,7 @@ You can find the following information within the docker image:
 
 Check the repository for `docker-compose` templates. They show configuration examples of `monerod` and `monero-wallet-rpc`, respectively.
 
-## authentication
+### authentication
 
 Authentication can be activated for `monerod` and `monero-wallet-rpc`.
 
@@ -90,6 +92,28 @@ If you don't provide user and password, you have two options:
 Example requesting the rpc:
 ```
     curl -u user:password --digest http://localhost:18081
+```
+
+It is always recommended to use RPC authentication.
+
+### wallet password
+
+The wallet password can be configured for `monero-wallet-cli` and `monero-wallet-rpc`.
+
+If the environment variable `WALLET_PASSWD` is set, the container's entrypoint script adds the option `--password $WALLET_PASSWD`.
+
+If you don't provide a wallet password that way:
+* You could set `--password-file wallet.passwd` and add a file containing the wallet password to the mounted voume.
+
+It is always recommended to use a wallet password.
+
+### raw commands
+
+It is also possible to deactivate the entrpoint script.
+
+This way, it is possible to define and configure e.g. the `monero-wallet-rpc` yourself:
+```
+docker run --rm -d --net host -v <path/to/and/including/wallet_folder>:/monero --entrypoint="" xmrto/monero monero-wallet-rpc --log-level 2 --daemon-host node.xmr.to --daemon-port 18081 --confirm-external-bind --rpc-login user:passwd --rpc-bind-ip 0.0.0.0 --rpc-bind-port 18083 --wallet-file wallet --password-file wallet.passwd
 ```
 
 ## monerod
@@ -123,8 +147,14 @@ The path `/monero` is supposed to be used as `--data-dir` configuration for `mon
 ## monero-wallet-rpc
 When used as `monero-wallet-rpc` the full command is necessary as command to docker run:
 
+Passing the pasword as environment variable:
 ```
-docker run --rm -d --net host -e DAEMON_HOST=node.xmr.to -e DAEMON_PORT=18081 -e RPC_BIND_PORT=18083 -v <path/to/and/including/wallet_folder>:/monero xmrto/monero monero-wallet-rpc  --wallet-file wallet --password-file wallet.passwd --disable-rpc-login
+docker run --rm -d --net host -e DAEMON_HOST=node.xmr.to -e DAEMON_PORT=18081 -e RPC_BIND_PORT=18083 -e RPC_USER=user -e RPC_PASSWD=passwd -e WALLET_PASSWD=securePasswd -v <path/to/and/including/wallet_folder>:/monero xmrto/monero monero-wallet-rpc  --wallet-file wallet
+```
+
+Using a password file:
+```
+docker run --rm -d --net host -e DAEMON_HOST=node.xmr.to -e DAEMON_PORT=18081 -e RPC_BIND_PORT=18083 -e RPC_USER=user -e RPC_PASSWD=passwd -v <path/to/and/including/wallet_folder>:/monero xmrto/monero monero-wallet-rpc  --wallet-file wallet --password-file wallet.passwd
 ```
 
 ### user
