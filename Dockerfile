@@ -105,7 +105,7 @@ RUN echo "\e[32mbuilding: $PROJECT_URL on branch: $BRANCH\e[39m" \
     && rm -rf /data/boost_${BOOST_VERSION} \
     && rm -rf /data/boost_${BOOST_VERSION}.tar.bz2
 
-FROM debian:stable-slim as dependencies2
+FROM index.docker.io/xmrto/monero:dependencies1 as dependencies2
 WORKDIR /data
 
 # BUILD_PATH:
@@ -218,7 +218,7 @@ RUN echo "\e[32mbuilding: Openssl\e[39m" \
     && cd /data \
     && rm -rf /data/libsodium
 
-FROM debian:stable-slim as builder
+FROM index.docker.io/xmrto/monero:dependencies2 as builder
 WORKDIR /data
 
 # BUILD_PATH:

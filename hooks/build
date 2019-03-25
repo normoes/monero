@@ -6,52 +6,52 @@ if [ -z "$BRANCH" ];then
   exit 1
 fi
 
-docker pull $IMAGE:dependencies1 || true
+docker pull $DOCKER_REPO:dependencies1 || true
 
 docker build \
   --pull \
   --target dependencies1 \
-  --cache-from $IMAGE:dependencies1 \
+  --cache-from $DOCKER_REPO:dependencies1 \
   --build-arg BRANCH=$BRANCH \
   -f ./Dockerfile \
-  -t $IMAGE_NAME:dependencies1 .
+  -t $DOCKER_REPO:dependencies1 .
 
-docker push $IMAGE:dependencies1
+docker push $DOCKER_REPO:dependencies1
 
-docker pull $IMAGE:dependencies2 || true
+docker pull $DOCKER_REPO:dependencies2 || true
 
 docker build \
   --pull \
   --target dependencies2 \
-  --cache-from $IMAGE:dependencies1 \
-  --cache-from $IMAGE:dependencies2 \
+  --cache-from $DOCKER_REPO:dependencies1 \
+  --cache-from $DOCKER_REPO:dependencies2 \
   --build-arg BRANCH=$BRANCH \
   -f ./Dockerfile \
-  -t $IMAGE_NAME:dependencies2 .
+  -t $DOCKER_REPO:dependencies2 .
 
-docker push $IMAGE:dependencies2
+docker push $DOCKER_REPO:dependencies2
 
-docker pull $IMAGE:builder || true
+docker pull $DOCKER_REPO:builder || true
 
 docker build \
   --pull \
   --target builder \
-  --cache-from $IMAGE:dependencies1 \
-  --cache-from $IMAGE:dependencies2 \
-  --cache-from $IMAGE:builder \
+  --cache-from $DOCKER_REPO:dependencies1 \
+  --cache-from $DOCKER_REPO:dependencies2 \
+  --cache-from $DOCKER_REPO:builder \
   --build-arg BRANCH=$BRANCH \
   -f ./Dockerfile \
-  -t $IMAGE_NAME:builder .
+  -t $DOCKER_REPO:builder .
 
-docker push $IMAGE:builder
-docker pull $IMAGE:latest || true
+docker push $DOCKER_REPO:builder
+docker pull $IMAGE_NAME || true
 
 docker build \
   --pull \
-  --cache-from $IMAGE:dependencies1 \
-  --cache-from $IMAGE:dependencies2 \
-  --cache-from $IMAGE:builder \
-  --cache-from $IMAGE:latest \
+  --cache-from $DOCKER_REPO:dependencies1 \
+  --cache-from $DOCKER_REPO:dependencies2 \
+  --cache-from $DOCKER_REPO:builder \
+  --cache-from $IMAGE_NAME \
   --build-arg BRANCH=$BRANCH \
   -f ./Dockerfile \
   -t $IMAGE_NAME:latest .
