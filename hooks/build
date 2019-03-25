@@ -5,5 +5,53 @@ if [ -z "$BRANCH" ];then
   echo "no branch could be found."
   exit 1
 fi
-docker build --pull --build-arg BRANCH=$BRANCH -t $IMAGE_NAME .
 
+docker pull $IMAGE:dependencies1 || true
+
+docker build \
+  --pull \
+  --target dependencies1 \
+  --cache-from $IMAGE:dependencies1 \
+  --build-arg BRANCH=$BRANCH \
+  -f ./Dockerfile \
+  -t $IMAGE_NAME:dependencies1 .
+
+docker push $IMAGE:dependencies1
+
+docker pull $IMAGE:dependencies2 || true
+
+docker build \
+  --pull \
+  --target dependencies2 \
+  --cache-from $IMAGE:dependencies1 \
+  --cache-from $IMAGE:dependencies2 \
+  --build-arg BRANCH=$BRANCH \
+  -f ./Dockerfile \
+  -t $IMAGE_NAME:dependencies2 .
+
+docker push $IMAGE:dependencies2
+
+docker pull $IMAGE:builder || true
+
+docker build \
+  --pull \
+  --target builder \
+  --cache-from $IMAGE:dependencies1 \
+  --cache-from $IMAGE:dependencies2 \
+  --cache-from $IMAGE:builder \
+  --build-arg BRANCH=$BRANCH \
+  -f ./Dockerfile \
+  -t $IMAGE_NAME:builder .
+
+docker push $IMAGE:builder
+docker pull $IMAGE:latest || true
+
+docker build \
+  --pull \
+  --cache-from $IMAGE:dependencies1 \
+  --cache-from $IMAGE:dependencies2 \
+  --cache-from $IMAGE:builder \
+  --cache-from $IMAGE:latest \
+  --build-arg BRANCH=$BRANCH \
+  -f ./Dockerfile \
+  -t $IMAGE_NAME:latest .

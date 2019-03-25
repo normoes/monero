@@ -1,4 +1,4 @@
-FROM debian:stable-slim as builder
+FROM debian:stable-slim as dependencies1
 
 WORKDIR /data
 
@@ -103,8 +103,63 @@ RUN echo "\e[32mbuilding: $PROJECT_URL on branch: $BRANCH\e[39m" \
     && ./b2 --build-type=minimal link=static runtime-link=static --with-chrono --with-date_time --with-filesystem --with-program_options --with-regex --with-serialization --with-system --with-thread --with-locale threading=multi threadapi=pthread cflags="$CFLAGS" cxxflags="$CXXFLAGS" stage > /dev/null \
     && cd /data \
     && rm -rf /data/boost_${BOOST_VERSION} \
-    && rm -rf /data/boost_${BOOST_VERSION}.tar.bz2 \
-    && echo "\e[32mbuilding: Openssl\e[39m" \
+    && rm -rf /data/boost_${BOOST_VERSION}.tar.bz2
+
+FROM debian:stable-slim as dependencies2
+WORKDIR /data
+
+# BUILD_PATH:
+# Using 'USE_SINGLE_BUILDDIR=1 make' creates a unified build dir (/monero.git/build/release/bin)
+
+ARG PROJECT_URL=https://github.com/monero-project/monero.git
+ARG BRANCH=master
+ARG BUILD_PATH=/monero.git/build/release/bin
+#su-exec
+ARG SUEXEC_VERSION=v0.2
+ARG SUEXEC_HASH=f85e5bde1afef399021fbc2a99c837cf851ceafa
+#Cmake
+ARG CMAKE_VERSION=3.14.0
+ARG CMAKE_VERSION_DOT=v3.14
+ARG CMAKE_HASH=aa76ba67b3c2af1946701f847073f4652af5cbd9f141f221c97af99127e75502
+## Boost
+ARG BOOST_VERSION=1_69_0
+ARG BOOST_VERSION_DOT=1.69.0
+ARG BOOST_HASH=8f32d4617390d1c2d16f26a27ab60d97807b35440d45891fa340fc2648b04406
+ENV BOOST_ROOT /usr/local/boost_${BOOST_VERSION}
+# OpenSSL
+ARG OPENSSL_VERSION=1.1.1b
+ARG OPENSSL_HASH=5c557b023230413dfb0756f3137a13e6d726838ccd1430888ad15bfb2b43ea4b
+ENV OPENSSL_ROOT_DIR=/usr/local/openssl-${OPENSSL_VERSION}
+# ZMQ
+ARG ZMQ_VERSION=v4.3.1
+ARG ZMQ_HASH=2cb1240db64ce1ea299e00474c646a2453a8435b
+# zmq.hpp
+ARG CPPZMQ_VERSION=v4.3.0
+ARG CPPZMQ_HASH=213da0b04ae3b4d846c9abc46bab87f86bfb9cf4
+# Readline
+ARG READLINE_VERSION=8.0
+ARG READLINE_HASH=e339f51971478d369f8a053a330a190781acb9864cf4c541060f12078948e461
+# Sodium
+ARG SODIUM_VERSION=1.0.17
+ARG SODIUM_HASH=b732443c442239c2e0184820e9b23cca0de0828c
+# Udev
+ARG UDEV_VERSION=v3.2.7
+ARG UDEV_HASH=4758e346a14126fc3a964de5831e411c27ebe487
+# Libusb
+ARG USB_VERSION=v1.0.22
+ARG USB_HASH=0034b2afdcdb1614e78edaa2a9e22d5936aeae5d
+# Hidapi
+ARG HIDAPI_VERSION=hidapi-0.8.0-rc1
+ARG HIDAPI_HASH=40cf516139b5b61e30d9403a48db23d8f915f52c
+# Protobuf
+ARG PROTOBUF_VERSION=v3.7.0
+ARG PROTOBUF_HASH=582743bf40c5d3639a70f98f183914a2c0cd0680
+
+ENV CFLAGS='-fPIC -O2 -g'
+ENV CXXFLAGS='-fPIC -O2 -g'
+ENV LDFLAGS='-static-libstdc++'
+
+RUN echo "\e[32mbuilding: Openssl\e[39m" \
     && set -ex \
     && curl -s -O https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz > /dev/null \
     && echo "${OPENSSL_HASH}  openssl-${OPENSSL_VERSION}.tar.gz" | sha256sum -c \
@@ -161,8 +216,63 @@ RUN echo "\e[32mbuilding: $PROJECT_URL on branch: $BRANCH\e[39m" \
     && make check > /dev/null \
     && make install > /dev/null \
     && cd /data \
-    && rm -rf /data/libsodium \
-    && echo "\e[32mbuilding: Udev\e[39m" \
+    && rm -rf /data/libsodium
+
+FROM debian:stable-slim as builder
+WORKDIR /data
+
+# BUILD_PATH:
+# Using 'USE_SINGLE_BUILDDIR=1 make' creates a unified build dir (/monero.git/build/release/bin)
+
+ARG PROJECT_URL=https://github.com/monero-project/monero.git
+ARG BRANCH=master
+ARG BUILD_PATH=/monero.git/build/release/bin
+#su-exec
+ARG SUEXEC_VERSION=v0.2
+ARG SUEXEC_HASH=f85e5bde1afef399021fbc2a99c837cf851ceafa
+#Cmake
+ARG CMAKE_VERSION=3.14.0
+ARG CMAKE_VERSION_DOT=v3.14
+ARG CMAKE_HASH=aa76ba67b3c2af1946701f847073f4652af5cbd9f141f221c97af99127e75502
+## Boost
+ARG BOOST_VERSION=1_69_0
+ARG BOOST_VERSION_DOT=1.69.0
+ARG BOOST_HASH=8f32d4617390d1c2d16f26a27ab60d97807b35440d45891fa340fc2648b04406
+ENV BOOST_ROOT /usr/local/boost_${BOOST_VERSION}
+# OpenSSL
+ARG OPENSSL_VERSION=1.1.1b
+ARG OPENSSL_HASH=5c557b023230413dfb0756f3137a13e6d726838ccd1430888ad15bfb2b43ea4b
+ENV OPENSSL_ROOT_DIR=/usr/local/openssl-${OPENSSL_VERSION}
+# ZMQ
+ARG ZMQ_VERSION=v4.3.1
+ARG ZMQ_HASH=2cb1240db64ce1ea299e00474c646a2453a8435b
+# zmq.hpp
+ARG CPPZMQ_VERSION=v4.3.0
+ARG CPPZMQ_HASH=213da0b04ae3b4d846c9abc46bab87f86bfb9cf4
+# Readline
+ARG READLINE_VERSION=8.0
+ARG READLINE_HASH=e339f51971478d369f8a053a330a190781acb9864cf4c541060f12078948e461
+# Sodium
+ARG SODIUM_VERSION=1.0.17
+ARG SODIUM_HASH=b732443c442239c2e0184820e9b23cca0de0828c
+# Udev
+ARG UDEV_VERSION=v3.2.7
+ARG UDEV_HASH=4758e346a14126fc3a964de5831e411c27ebe487
+# Libusb
+ARG USB_VERSION=v1.0.22
+ARG USB_HASH=0034b2afdcdb1614e78edaa2a9e22d5936aeae5d
+# Hidapi
+ARG HIDAPI_VERSION=hidapi-0.8.0-rc1
+ARG HIDAPI_HASH=40cf516139b5b61e30d9403a48db23d8f915f52c
+# Protobuf
+ARG PROTOBUF_VERSION=v3.7.0
+ARG PROTOBUF_HASH=582743bf40c5d3639a70f98f183914a2c0cd0680
+
+ENV CFLAGS='-fPIC -O2 -g'
+ENV CXXFLAGS='-fPIC -O2 -g'
+ENV LDFLAGS='-static-libstdc++'
+
+RUN echo "\e[32mbuilding: Udev\e[39m" \
     && set -ex \
     && git clone --branch ${UDEV_VERSION} --single-branch --depth 1 https://github.com/gentoo/eudev > /dev/null \
     && cd eudev \
