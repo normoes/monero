@@ -41,7 +41,7 @@ RUN apt-get update -qq && apt-get --no-install-recommends -yqq install \
     && git clone --branch ${SUEXEC_VERSION} --single-branch --depth 1 https://github.com/ncopa/su-exec.git su-exec.git > /dev/null \
     && cd su-exec.git || exit 1 \
     && test `git rev-parse HEAD` = ${SUEXEC_HASH} || exit 1 \
-    && make -j4 > /dev/null \
+    && make -j2 > /dev/null \
     && cp su-exec /data \
     && cd /data || exit 1 \
     && rm -rf /data/su-exec.git \
@@ -52,7 +52,7 @@ RUN apt-get update -qq && apt-get --no-install-recommends -yqq install \
     && tar -xzf cmake-${CMAKE_VERSION}.tar.gz > /dev/null \
     && cd cmake-${CMAKE_VERSION} || exit 1 \
     && ./configure --prefix=$BASE_DIR > /dev/null \
-    && make -j4 > /dev/null \
+    && make -j2 > /dev/null \
     && make install > /dev/null \
     && cd /data || exit 1 \
     && rm -rf /data/cmake-${CMAKE_VERSION} \
@@ -114,7 +114,7 @@ RUN echo "\e[32mbuilding: Openssl\e[39m" \
     && test `git rev-parse HEAD` = ${ZMQ_HASH} || exit 1 \
     && ./autogen.sh > /dev/null \
     && ./configure --prefix=$BASE_DIR --enable-libunwind=no --enable-static --disable-shared > /dev/null \
-    && make -j4 > /dev/null \
+    && make -j2 > /dev/null \
     && make install > /dev/null \
     && ldconfig > /dev/null \
     && cd /data || exit 1 \
@@ -134,7 +134,7 @@ RUN echo "\e[32mbuilding: Openssl\e[39m" \
     && tar -xzf readline-${READLINE_VERSION}.tar.gz > /dev/null \
     && cd readline-${READLINE_VERSION} || exit 1 \
     && ./configure --prefix=$BASE_DIR > /dev/null \
-    && make -j4 > /dev/null \
+    && make -j2 > /dev/null \
     && make install > /dev/null \
     && cd /data || exit 1 \
     && rm -rf /data/readline-${READLINE_VERSION} \
@@ -146,7 +146,7 @@ RUN echo "\e[32mbuilding: Openssl\e[39m" \
     && test `git rev-parse HEAD` = ${SODIUM_HASH} || exit 1 \
     && ./autogen.sh \
     && ./configure --prefix=$BASE_DIR > /dev/null \
-    && make -j4 > /dev/null \
+    && make -j2 > /dev/null \
     && make check > /dev/null \
     && make install > /dev/null \
     && cd /data || exit 1 \
@@ -181,7 +181,7 @@ RUN echo "\e[32mbuilding: Udev\e[39m" \
     && test `git rev-parse HEAD` = ${UDEV_HASH} || exit 1 \
     && ./autogen.sh \
     && ./configure --prefix=$BASE_DIR --disable-gudev --disable-introspection --disable-hwdb --disable-manpages --disable-shared > /dev/null \
-    && make -j4 > /dev/null \
+    && make -j2 > /dev/null \
     && make install > /dev/null \
     && cd /data || exit 1 \
     && rm -rf /data/eudev \
@@ -192,7 +192,7 @@ RUN echo "\e[32mbuilding: Udev\e[39m" \
     && test `git rev-parse HEAD` = ${USB_HASH} || exit 1 \
     && ./autogen.sh > /dev/null \
     && ./configure --prefix=$BASE_DIR --disable-shared > /dev/null \
-    && make -j4 > /dev/null \
+    && make -j2 > /dev/null \
     && make install > /dev/null \
     && cd /data || exit 1 \
     && rm -rf /data/libusb \
@@ -203,7 +203,7 @@ RUN echo "\e[32mbuilding: Udev\e[39m" \
     && test `git rev-parse HEAD` = ${HIDAPI_HASH} || exit 1 \
     && ./bootstrap \
     && ./configure --prefix=$BASE_DIR --enable-static --disable-shared > /dev/null \
-    && make -j4 > /dev/null \
+    && make -j2 > /dev/null \
     && make install > /dev/null \
     && cd /data || exit 1 \
     && rm -rf /data/hidapi \
@@ -215,7 +215,7 @@ RUN echo "\e[32mbuilding: Udev\e[39m" \
     && git submodule update --init --recursive > /dev/null \
     && ./autogen.sh > /dev/null \
     && ./configure --prefix=$BASE_DIR --enable-static --disable-shared > /dev/null \
-    && make -j4 > /dev/null \
+    && make -j2 > /dev/null \
     && make install > /dev/null \
     && ldconfig \
     && cd /data || exit 1 \
@@ -244,7 +244,7 @@ RUN echo "\e[32mcloning: $PROJECT_URL on branch: $BRANCH\e[39m" \
     # && git apply --check ../bulletproofs_1.patch \
     # && git apply  ../bulletproofs_1.patch \
     && echo "\e[32mbuilding static binaries\e[39m" \
-    && USE_SINGLE_BUILDDIR=1 make -j4 release-static \
+    && USE_SINGLE_BUILDDIR=1 make -j2 release-static \
     && echo "\e[32mcopy and clean up\e[39m" \
     && mv /data$BUILD_PATH/monerod /data/ \
     && chmod +x /data/monerod \
