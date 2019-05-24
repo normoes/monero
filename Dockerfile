@@ -36,25 +36,25 @@ RUN apt-get update -qq && apt-get --no-install-recommends -yqq install \
         xsltproc \
         gperf \
         unzip > /dev/null \
-    && cd /data \
+    && cd /data || exit 1 \
     && echo "\e[32mbuilding: su-exec\e[39m" \
     && git clone --branch ${SUEXEC_VERSION} --single-branch --depth 1 https://github.com/ncopa/su-exec.git su-exec.git > /dev/null \
-    && cd su-exec.git \
+    && cd su-exec.git || exit 1 \
     && test `git rev-parse HEAD` = ${SUEXEC_HASH} || exit 1 \
     && make -j4 > /dev/null \
     && cp su-exec /data \
-    && cd /data \
+    && cd /data || exit 1 \
     && rm -rf /data/su-exec.git \
     && echo "\e[32mbuilding: Cmake\e[39m" \
     && set -ex \
     && curl -s -O https://cmake.org/files/${CMAKE_VERSION_DOT}/cmake-${CMAKE_VERSION}.tar.gz > /dev/null \
     && echo "${CMAKE_HASH}  cmake-${CMAKE_VERSION}.tar.gz" | sha256sum -c \
     && tar -xzf cmake-${CMAKE_VERSION}.tar.gz > /dev/null \
-    && cd cmake-${CMAKE_VERSION} \
+    && cd cmake-${CMAKE_VERSION} || exit 1 \
     && ./configure --prefix=$BASE_DIR > /dev/null \
     && make -j4 > /dev/null \
     && make install > /dev/null \
-    && cd /data \
+    && cd /data || exit 1 \
     && rm -rf /data/cmake-${CMAKE_VERSION} \
     && rm -rf /data/cmake-${CMAKE_VERSION}.tar.gz \
     && echo "\e[32mbuilding: Boost\e[39m" \
@@ -62,10 +62,10 @@ RUN apt-get update -qq && apt-get --no-install-recommends -yqq install \
     && curl -s -L -o  boost_${BOOST_VERSION}.tar.bz2 https://dl.bintray.com/boostorg/release/${BOOST_VERSION_DOT}/source/boost_${BOOST_VERSION}.tar.bz2 > /dev/null \
     && echo "${BOOST_HASH}  boost_${BOOST_VERSION}.tar.bz2" | sha256sum -c \
     && tar -xvf boost_${BOOST_VERSION}.tar.bz2 > /dev/null \
-    && cd boost_${BOOST_VERSION} \
+    && cd boost_${BOOST_VERSION} || exit 1 \
     && ./bootstrap.sh > /dev/null \
     && ./b2 -a install --prefix=$BASE_DIR --build-type=minimal link=static runtime-link=static --with-chrono --with-date_time --with-filesystem --with-program_options --with-regex --with-serialization --with-system --with-thread --with-locale threading=multi threadapi=pthread cflags="$CFLAGS" cxxflags="$CXXFLAGS" stage > /dev/null \
-    && cd /data \
+    && cd /data || exit 1 \
     && rm -rf /data/boost_${BOOST_VERSION} \
     && rm -rf /data/boost_${BOOST_VERSION}.tar.bz2
 
@@ -104,52 +104,52 @@ RUN echo "\e[32mbuilding: Openssl\e[39m" \
     && make build_generated > /dev/null \
     && make libcrypto.a > /dev/null \
     && make install > /dev/null \
-    && cd /data \
+    && cd /data || exit 1 \
     && rm -rf /data/openssl-${OPENSSL_VERSION} \
     && rm -rf /data/openssl-${OPENSSL_VERSION}.tar.gz \
     && echo "\e[32mbuilding: ZMQ\e[39m" \
     && set -ex \
     && git clone --branch ${ZMQ_VERSION} --single-branch --depth 1 https://github.com/zeromq/libzmq.git > /dev/null \
-    && cd libzmq \
+    && cd libzmq || exit 1 \
     && test `git rev-parse HEAD` = ${ZMQ_HASH} || exit 1 \
     && ./autogen.sh > /dev/null \
     && ./configure --prefix=$BASE_DIR --enable-libunwind=no --enable-static --disable-shared > /dev/null \
     && make -j4 > /dev/null \
     && make install > /dev/null \
     && ldconfig > /dev/null \
-    && cd /data \
+    && cd /data || exit 1 \
     && rm -rf /data/libzmq \
     && echo "\e[32mbuilding: zmq.hpp\e[39m" \
     && set -ex \
     && git clone --branch ${CPPZMQ_VERSION} --single-branch --depth 1 https://github.com/zeromq/cppzmq.git > /dev/null \
-    && cd cppzmq \
+    && cd cppzmq || exit 1 \
     && test `git rev-parse HEAD` = ${CPPZMQ_HASH} || exit 1 \
     && mv *.hpp $BASE_DIR/include \
-    && cd /data \
+    && cd /data || exit 1 \
     && rm -rf /data/cppzmq \
     && echo "\e[32mbuilding: Readline\e[39m" \
     && set -ex \
     && curl -s -O https://ftp.gnu.org/gnu/readline/readline-${READLINE_VERSION}.tar.gz > /dev/null \
     && echo "${READLINE_HASH}  readline-${READLINE_VERSION}.tar.gz" | sha256sum -c \
     && tar -xzf readline-${READLINE_VERSION}.tar.gz > /dev/null \
-    && cd readline-${READLINE_VERSION} \
+    && cd readline-${READLINE_VERSION} || exit 1 \
     && ./configure --prefix=$BASE_DIR > /dev/null \
     && make -j4 > /dev/null \
     && make install > /dev/null \
-    && cd /data \
+    && cd /data || exit 1 \
     && rm -rf /data/readline-${READLINE_VERSION} \
     && rm -rf readline-${READLINE_VERSION}.tar.gz \
     && echo "\e[32mbuilding: Sodium\e[39m" \
     && set -ex \
     && git clone --branch ${SODIUM_VERSION} --single-branch --depth 1 https://github.com/jedisct1/libsodium.git > /dev/null \
-    && cd libsodium \
+    && cd libsodium || exit 1 \
     && test `git rev-parse HEAD` = ${SODIUM_HASH} || exit 1 \
     && ./autogen.sh \
     && ./configure --prefix=$BASE_DIR > /dev/null \
     && make -j4 > /dev/null \
     && make check > /dev/null \
     && make install > /dev/null \
-    && cd /data \
+    && cd /data || exit 1 \
     && rm -rf /data/libsodium
 
 FROM index.docker.io/xmrto/monero:dependencies2 as dependencies3
@@ -177,40 +177,40 @@ ENV LDFLAGS '-static-libstdc++'
 RUN echo "\e[32mbuilding: Udev\e[39m" \
     && set -ex \
     && git clone --branch ${UDEV_VERSION} --single-branch --depth 1 https://github.com/gentoo/eudev > /dev/null \
-    && cd eudev \
+    && cd eudev || exit 1 \
     && test `git rev-parse HEAD` = ${UDEV_HASH} || exit 1 \
     && ./autogen.sh \
     && ./configure --prefix=$BASE_DIR --disable-gudev --disable-introspection --disable-hwdb --disable-manpages --disable-shared > /dev/null \
     && make -j4 > /dev/null \
     && make install > /dev/null \
-    && cd /data \
+    && cd /data || exit 1 \
     && rm -rf /data/eudev \
     && echo "\e[32mbuilding: Libusb\e[39m" \
     && set -ex \
     && git clone --branch ${USB_VERSION} --single-branch --depth 1 https://github.com/libusb/libusb.git > /dev/null \
-    && cd libusb \
+    && cd libusb || exit 1 \
     && test `git rev-parse HEAD` = ${USB_HASH} || exit 1 \
-    && ./autogen.sh \
+    && ./autogen.sh > /dev/null \
     && ./configure --prefix=$BASE_DIR --disable-shared > /dev/null \
     && make -j4 > /dev/null \
     && make install > /dev/null \
-    && cd /data \
+    && cd /data || exit 1 \
     && rm -rf /data/libusb \
     && echo "\e[32mbuilding: Hidapi\e[39m" \
     && set -ex \
     && git clone --branch ${HIDAPI_VERSION} --single-branch --depth 1 https://github.com/signal11/hidapi > /dev/null \
-    && cd hidapi \
+    && cd hidapi || exit 1 \
     && test `git rev-parse HEAD` = ${HIDAPI_HASH} || exit 1 \
     && ./bootstrap \
     && ./configure --prefix=$BASE_DIR --enable-static --disable-shared > /dev/null \
     && make -j4 > /dev/null \
     && make install > /dev/null \
-    && cd /data \
+    && cd /data || exit 1 \
     && rm -rf /data/hidapi \
     && echo "\e[32mbuilding: Protobuf\e[39m" \
     && set -ex \
     && git clone --branch ${PROTOBUF_VERSION}  --single-branch --depth 1 https://github.com/protocolbuffers/protobuf > /dev/null \
-    && cd protobuf \
+    && cd protobuf || exit 1 \
     && test `git rev-parse HEAD` = ${PROTOBUF_HASH} || exit 1 \
     && git submodule update --init --recursive > /dev/null \
     && ./autogen.sh > /dev/null \
@@ -218,7 +218,7 @@ RUN echo "\e[32mbuilding: Udev\e[39m" \
     && make -j4 > /dev/null \
     && make install > /dev/null \
     && ldconfig \
-    && cd /data \
+    && cd /data || exit 1 \
     && rm -rf /data/protobuf
 
 FROM index.docker.io/xmrto/monero:dependencies3 as builder
@@ -238,7 +238,7 @@ ENV LDFLAGS '-static-libstdc++'
 
 RUN echo "\e[32mcloning: $PROJECT_URL on branch: $BRANCH\e[39m" \
     && git clone --branch "$BRANCH" --single-branch --recursive $PROJECT_URL monero.git > /dev/null \
-    && cd monero.git \
+    && cd monero.git || exit 1 \
     # && echo "\e[32mapplying version patch\e[39m" \
     # && git apply --stat ../bulletproofs_1.patch \
     # && git apply --check ../bulletproofs_1.patch \
@@ -252,7 +252,7 @@ RUN echo "\e[32mcloning: $PROJECT_URL on branch: $BRANCH\e[39m" \
     && chmod +x /data/monero-wallet-rpc \
     && mv /data$BUILD_PATH/monero-wallet-cli /data/ \
     && chmod +x /data/monero-wallet-cli \
-    && cd /data \
+    && cd /data || exit 1 \
     && rm -rf /data/monero.git \
     && apt-get purge -yqq \
         g++ \
@@ -272,7 +272,7 @@ RUN echo "\e[32mcloning: $PROJECT_URL on branch: $BRANCH\e[39m" \
         unzip > /dev/null \
     && apt-get autoremove --purge -yqq > /dev/null \
     && apt-get clean > /dev/null \
-    && rm -rf /var/tmp/* /tmp/* /var/lib/apt
+    && rm -rf /var/tmp/* /tmp/* /var/lib/apt/* > /dev/null
 
 FROM debian:stable-slim
 COPY --from=builder /data/monerod /usr/local/bin/
@@ -286,10 +286,11 @@ RUN apt-get update -qq && apt-get install -yqq --no-install-recommends \
         tor > /dev/null \
     && apt-get autoremove --purge -yqq > /dev/null \
     && apt-get clean > /dev/null \
-    && rm -rf /var/tmp/* /tmp/* /var/lib/apt > /dev/null
+    && rm -rf /var/tmp/* /tmp/* /var/lib/apt/* > /dev/null
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
+COPY ipnutrc /etc/inputrc
 # Copy Tor configuration files after installing Tor apps
 # otherwise configuration might be replaced, build might stop
 COPY torsocks.conf /etc/tor/torsocks.conf

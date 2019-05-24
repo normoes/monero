@@ -1,25 +1,25 @@
 #!/bin/bash
 
-if [ "$RELEASE_BRANCH" == "$SOURCE_BRANCH" ]; then
-  curl -X POST \
-       -F token=$MONERO_DAEMON_TOKEN \
-       -F ref=$BRANCH_TEST \
-       $MONERO_DAEMON_URL
-elif [ "$PATCHED_BRANCH" == "$SOURCE_BRANCH" ]; then
-  curl -X POST \
-       -F token=$MONERO_DAEMON_TOKEN \
-       -F ref=$BRANCH_MAIN \
-       $MONERO_DAEMON_URL
-  curl -X POST \
-       -F token=$MONERO_DAEMON_TOKEN \
-       -F ref=$BRANCH_STAGE \
-       $MONERO_DAEMON_URL
-else
-  BRANCH=$(curl -s https://api.github.com/repos/monero-project/monero/tags | grep -i name | awk 'NR==1{print $2}' | tr -d "\",")
-  if [ -z "$BRANCH" ];then
-    echo "no branch could be found."
-    exit 1
-  fi
-  docker tag $IMAGE_NAME $DOCKER_REPO:$BRANCH
-  docker push $DOCKER_REPO:$BRANCH
-fi
+# if [ "$RELEASE_BRANCH" == "$SOURCE_BRANCH" ]; then
+#   curl -X POST \
+#        -F token=$MONERO_DAEMON_TOKEN \
+#        -F ref=$BRANCH_TEST \
+#        $MONERO_DAEMON_URL
+# elif [ "$PATCHED_BRANCH" == "$SOURCE_BRANCH" ]; then
+#   curl -X POST \
+#        -F token=$MONERO_DAEMON_TOKEN \
+#        -F ref=$BRANCH_MAIN \
+#        $MONERO_DAEMON_URL
+#   curl -X POST \
+#        -F token=$MONERO_DAEMON_TOKEN \
+#        -F ref=$BRANCH_STAGE \
+#        $MONERO_DAEMON_URL
+# else
+#   BRANCH=$(curl -s https://api.github.com/repos/monero-project/monero/tags | grep -i name | awk 'NR==1{print $2}' | tr -d "\",")
+#   if [ -z "$BRANCH" ];then
+#     echo "no branch could be found."
+#     exit 1
+#   fi
+#   docker tag $IMAGE_NAME $DOCKER_REPO:$BRANCH
+#   docker push $DOCKER_REPO:$BRANCH
+# fi
