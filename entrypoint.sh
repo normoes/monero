@@ -44,12 +44,6 @@ fi
 if [ "$(id -u)" = 0 ]; then
   # USER_ID defaults to 1000 (Dockerfile)
   adduser --system --group --uid "$USER_ID" --shell /bin/false monero &> /dev/null
-
-  cat << 'EOF' > /home/monero/.inputrc
-"\e[1;5D": backward-word
-"\e[1;5C": forward-word
-EOF
-
   exec su-exec monero $@
 fi
 
