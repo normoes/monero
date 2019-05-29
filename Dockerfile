@@ -230,8 +230,8 @@ ARG PROJECT_URL=https://github.com/monero-project/monero.git
 ARG BRANCH=master
 ARG BUILD_PATH=/monero.git/build/release/bin
 
-ENV CFLAGS '-fPIC -O2 -g'
-ENV CXXFLAGS '-fPIC -O2 -g'
+ENV CFLAGS '-fPIC -O1'
+ENV CXXFLAGS '-fPIC -O1'
 ENV LDFLAGS '-static-libstdc++'
 
 # COPY bulletproofs_1.patch /data
@@ -300,6 +300,7 @@ WORKDIR /monero
 
 RUN monerod --version > /version.txt \
     && cat /etc/os-release > /system.txt \
+    && cat /proc/version >> /system.txt \
     && ldd $(command -v monerod) > /dependencies.txt \
     && torsocks --version > /torsocks.txt \
     && tor --version > /tor.txt
