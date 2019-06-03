@@ -14,12 +14,8 @@
 #        -F token=$MONERO_DAEMON_TOKEN \
 #        -F ref=$BRANCH_STAGE \
 #        $MONERO_DAEMON_URL
-# else
-#   BRANCH=$(curl -s https://api.github.com/repos/monero-project/monero/tags | grep -i name | awk 'NR==1{print $2}' | tr -d "\",")
-#   if [ -z "$BRANCH" ];then
-#     echo "no branch could be found."
-#     exit 1
-#   fi
-#   docker tag $IMAGE_NAME $DOCKER_REPO:$BRANCH
-#   docker push $DOCKER_REPO:$BRANCH
-# fi
+MOST_RECENT_TAG=$(curl -s https://api.github.com/repos/monero-project/monero/tags | grep -i name | awk 'NR==1{print $2}' | tr -d "\",")
+if [ "$MOST_RECENT_TAG" == "$DOCKER_TAG" ]; then
+  docker tag $IMAGE_NAME $DOCKER_REPO:most_recent_tag
+  docker push $DOCKER_REPO:most_recent_tag
+fi
