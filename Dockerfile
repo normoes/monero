@@ -99,7 +99,7 @@ RUN echo "\e[32mbuilding: Openssl\e[39m" \
     && curl -s -O https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz > /dev/null \
     && echo "${OPENSSL_HASH}  openssl-${OPENSSL_VERSION}.tar.gz" | sha256sum -c \
     && tar -xzf openssl-${OPENSSL_VERSION}.tar.gz > /dev/null \
-    && cd openssl-${OPENSSL_VERSION} \
+    && cd openssl-${OPENSSL_VERSION} || exit 1 \
     && ./Configure --prefix=$BASE_DIR linux-x86_64 no-shared --static "$CFLAGS" > /dev/null \
     && make build_generated > /dev/null \
     && make libcrypto.a > /dev/null \
@@ -244,7 +244,9 @@ RUN echo "\e[32mcloning: $PROJECT_URL on branch: $BRANCH\e[39m" \
     # && git apply --check ../bulletproofs_1.patch \
     # && git apply  ../bulletproofs_1.patch \
     && echo "\e[32mbuilding static binaries\e[39m" \
-    && USE_SINGLE_BUILDDIR=1 make release-static \
+    && apt-get update -qq && apt-get install -yqq --no-install-recommends \
+        libreadline-dev \
+    && USE_SINGLE_BUILDDIR=1 make release-static > /dev/null \
     && echo "\e[32mcopy and clean up\e[39m" \
     && mv /data$BUILD_PATH/monerod /data/ \
     && chmod +x /data/monerod \
@@ -255,21 +257,22 @@ RUN echo "\e[32mcloning: $PROJECT_URL on branch: $BRANCH\e[39m" \
     && cd /data || exit 1 \
     && rm -rf /data/monero.git \
     && apt-get purge -yqq \
-        g++ \
-        doxygen \
-        graphviz \
-        git \
-        curl \
         ca-certificates \
+        g++ \
         make \
         pkg-config \
+        graphviz \
+        doxygen \
+        git \
+        curl \
         libtool-bin \
         autoconf \
         automake \
         bzip2 \
         xsltproc \
         gperf \
-        unzip > /dev/null \
+        unzip \
+        libreadline-dev > /dev/null \
     && apt-get autoremove --purge -yqq > /dev/null \
     && apt-get clean > /dev/null \
     && rm -rf /var/tmp/* /tmp/* /var/lib/apt/* > /dev/null
@@ -281,7 +284,6 @@ COPY --from=builder /data/monero-wallet-cli /usr/local/bin/
 COPY --from=builder /data/su-exec /usr/local/bin/
 
 RUN apt-get update -qq && apt-get install -yqq --no-install-recommends \
-        # ca-certificates \
         torsocks \
         tor > /dev/null \
     && apt-get autoremove --purge -yqq > /dev/null \
