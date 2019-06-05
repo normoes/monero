@@ -1,7 +1,7 @@
 ## Supported tags and respective `Dockerfile` links
 * `latest` ([Dockerfile](https://github.com/XMRto/monero/blob/master/Dockerfile))
-* `most_recent_tag` ([Dockerfile](https://github.com/XMRto/monero/blob/most_recent_tag/Dockerfile))
-* `v0.14.0.2` ([Dockerfile](https://github.com/XMRto/monero/blob/most_recent_tag/Dockerfile))
+* `most_recent_tag` ([Dockerfile](https://github.com/XMRto/monero/blob/v0.14.0.2/Dockerfile))
+* `v0.14.0.2` ([Dockerfile](https://github.com/XMRto/monero/blob/v0.14.0.2/Dockerfile))
 
 ---
 
@@ -16,14 +16,9 @@ This daemon is built from source: [monero project](https://github.com/monero-pro
 * The `latest` docker image is based on `master` branch.
 * Monero tools can also be used through the Tor network, see **Tor software** below.
 
-## system and binary information
+`readline` is finally compiled into the binaries, so using `monero-wallet-cli` is way more convenient.
 
-You can find the following information within the docker image:
-* `/version.txt` contains output of `monerod --version`
-* `/system.txt` contains output of `cat /etc/os-release`
-* `/dependencies.txt` contains output of `ldd $(command -v monerod)`
-* `/torsocks.txt` contains output of `torsocks --version`
-* `/tor.txt` contains output of `tor --version`
+## system and binary information
 
 ## default configuration
 
@@ -33,6 +28,7 @@ You can find the following information within the docker image:
   - The container can also be started with `--user 1000`
     + No existing user is used then
   - Running `monero` as `root` is not possible (`USER_ID` defaults to 1000).
+    + Of course, you can still disable the entrypoint with `--entrypoint=""` and run as root with `-u 0` ...
 * `monerod` and `monero-wallet-rpc`
   - `--log-level=$LOG_LEVEL` (**default**: `0`) (also `monero-wallet-cli`)
   - `--confirm-external-bind`
