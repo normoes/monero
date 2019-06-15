@@ -1,7 +1,7 @@
 ## Supported tags and respective `Dockerfile` links
 * `latest` ([Dockerfile](https://github.com/XMRto/monero/blob/master/Dockerfile))
-* `most_recent_tag` ([Dockerfile](https://github.com/XMRto/monero/blob/v0.14.0.2/Dockerfile))
-* `v0.14.0.2` ([Dockerfile](https://github.com/XMRto/monero/blob/v0.14.0.2/Dockerfile))
+* `most_recent_tag` ([Dockerfile](https://github.com/XMRto/monero/blob/v0.14.1.0/Dockerfile))
+* `v0.14.1.0` ([Dockerfile](https://github.com/XMRto/monero/blob/v0.14.1.0/Dockerfile))
 
 ---
 
