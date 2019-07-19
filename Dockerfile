@@ -234,15 +234,15 @@ ENV CFLAGS '-fPIC -O1'
 ENV CXXFLAGS '-fPIC -O1'
 ENV LDFLAGS '-static-libstdc++'
 
-# COPY bulletproofs_1.patch /data
+# COPY patch.diff /data
 
 RUN echo "\e[32mcloning: $PROJECT_URL on branch: $BRANCH\e[39m" \
     && git clone --branch "$BRANCH" --single-branch --recursive $PROJECT_URL monero.git > /dev/null \
     && cd monero.git || exit 1 \
     # && echo "\e[32mapplying version patch\e[39m" \
-    # && git apply --stat ../bulletproofs_1.patch \
-    # && git apply --check ../bulletproofs_1.patch \
-    # && git apply  ../bulletproofs_1.patch \
+    # && git apply --stat ../patch.diff \
+    # && git apply --check ../patch.diff \
+    # && git apply  ../patch.diff \
     && echo "\e[32mbuilding static binaries\e[39m" \
     && apt-get update -qq && apt-get install -yqq --no-install-recommends \
         libreadline-dev \
