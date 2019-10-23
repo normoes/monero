@@ -1,6 +1,7 @@
 #!/bin/bash
 
-LOGGING="--log-level $LOG_LEVEL"
+# allow 3 files with 5MB each
+LOGGING="--log-level $LOG_LEVEL --max-log-file-size 5242880 --max-log-files 3"
 
 DAEMON_OPTIONS="--daemon-host $DAEMON_HOST --daemon-port $DAEMON_PORT"
 
@@ -19,8 +20,6 @@ RPC_OPTIONS="$LOGGING $RPC_LOGIN --confirm-external-bind --rpc-bind-ip $RPC_BIND
 MONEROD_OPTIONS="--p2p-bind-ip $P2P_BIND_IP --p2p-bind-port $P2P_BIND_PORT"
 
 MONEROD="monerod $@ $RPC_OPTIONS $MONEROD_OPTIONS --check-updates disabled"
-
-# COMMAND="$@"
 
 if [[ "${1:0:1}" = '-' ]]  || [[ -z "$@" ]]; then
   set -- $MONEROD

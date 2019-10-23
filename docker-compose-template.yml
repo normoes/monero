@@ -1,12 +1,13 @@
 version: '2'
 
 services:
-  monerod-testnet:
+  monerod:
     build:
       context: .
       dockerfile: Dockerfile
       args:
-        BRANCH: master
+        BRANCH: v0.14.1.2
+        DEBIAN_VERSION: "stable-20191014-slim"
     command: --testnet --data-dir /monero --non-interactive
     volumes:
       # /monero in container should eventually contain the contents of the folder .bitmonero

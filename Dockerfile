@@ -1,4 +1,5 @@
-FROM debian:stable-slim as dependencies1
+ARG DEBIAN_VERSION="${DEBIAN_VERSION:-stable-slim}"
+FROM debian:${DEBIAN_VERSION} as dependencies1
 
 WORKDIR /data
 
@@ -6,17 +7,17 @@ WORKDIR /data
 ARG SUEXEC_VERSION=v0.2
 ARG SUEXEC_HASH=f85e5bde1afef399021fbc2a99c837cf851ceafa
 #Cmake
-ARG CMAKE_VERSION=3.14.0
+ARG CMAKE_VERSION=3.14.6
 ARG CMAKE_VERSION_DOT=v3.14
-ARG CMAKE_HASH=aa76ba67b3c2af1946701f847073f4652af5cbd9f141f221c97af99127e75502
+ARG CMAKE_HASH=4e8ea11cabe459308671b476469eace1622e770317a15951d7b55a82ccaaccb9
 ## Boost
-ARG BOOST_VERSION=1_69_0
-ARG BOOST_VERSION_DOT=1.69.0
-ARG BOOST_HASH=8f32d4617390d1c2d16f26a27ab60d97807b35440d45891fa340fc2648b04406
+ARG BOOST_VERSION=1_70_0
+ARG BOOST_VERSION_DOT=1.70.0
+ARG BOOST_HASH=430ae8354789de4fd19ee52f3b1f739e1fba576f0aded0897c3c2bc00fb38778
 
-ENV CFLAGS '-fPIC -O2 -g'
-ENV CXXFLAGS '-fPIC -O2 -g'
-ENV LDFLAGS '-static-libstdc++'
+ENV CFLAGS='-fPIC -O2 -g'
+ENV CXXFLAGS='-fPIC -O2 -g'
+ENV LDFLAGS='-static-libstdc++'
 
 ENV BASE_DIR /usr/local
 
@@ -78,21 +79,21 @@ ENV BASE_DIR /usr/local
 ARG OPENSSL_VERSION=1.1.1b
 ARG OPENSSL_HASH=5c557b023230413dfb0756f3137a13e6d726838ccd1430888ad15bfb2b43ea4b
 # ZMQ
-ARG ZMQ_VERSION=v4.3.1
-ARG ZMQ_HASH=2cb1240db64ce1ea299e00474c646a2453a8435b
+ARG ZMQ_VERSION=v4.3.2
+ARG ZMQ_HASH=a84ffa12b2eb3569ced199660bac5ad128bff1f0
 # zmq.hpp
-ARG CPPZMQ_VERSION=v4.3.0
-ARG CPPZMQ_HASH=213da0b04ae3b4d846c9abc46bab87f86bfb9cf4
+ARG CPPZMQ_VERSION=v4.4.1
+ARG CPPZMQ_HASH=f5b36e563598d48fcc0d82e589d3596afef945ae
 # Readline
 ARG READLINE_VERSION=8.0
 ARG READLINE_HASH=e339f51971478d369f8a053a330a190781acb9864cf4c541060f12078948e461
 # Sodium
-ARG SODIUM_VERSION=1.0.17
-ARG SODIUM_HASH=b732443c442239c2e0184820e9b23cca0de0828c
+ARG SODIUM_VERSION=1.0.18
+ARG SODIUM_HASH=4f5e89fa84ce1d178a6765b8b46f2b6f91216677
 
-ENV CFLAGS '-fPIC -O2 -g'
-ENV CXXFLAGS '-fPIC -O2 -g'
-ENV LDFLAGS '-static-libstdc++'
+ENV CFLAGS='-fPIC -O2 -g'
+ENV CXXFLAGS='-fPIC -O2 -g'
+ENV LDFLAGS='-static-libstdc++'
 
 RUN echo "\e[32mbuilding: Openssl\e[39m" \
     && set -ex \
@@ -158,8 +159,8 @@ WORKDIR /data
 ENV BASE_DIR /usr/local
 
 # Udev
-ARG UDEV_VERSION=v3.2.7
-ARG UDEV_HASH=4758e346a14126fc3a964de5831e411c27ebe487
+ARG UDEV_VERSION=v3.2.8
+ARG UDEV_HASH=d69f3f28348123ab7fa0ebac63ec2fd16800c5e0
 # Libusb
 ARG USB_VERSION=v1.0.22
 ARG USB_HASH=0034b2afdcdb1614e78edaa2a9e22d5936aeae5d
@@ -167,12 +168,12 @@ ARG USB_HASH=0034b2afdcdb1614e78edaa2a9e22d5936aeae5d
 ARG HIDAPI_VERSION=hidapi-0.8.0-rc1
 ARG HIDAPI_HASH=40cf516139b5b61e30d9403a48db23d8f915f52c
 # Protobuf
-ARG PROTOBUF_VERSION=v3.7.0
-ARG PROTOBUF_HASH=582743bf40c5d3639a70f98f183914a2c0cd0680
+ARG PROTOBUF_VERSION=v3.7.1
+ARG PROTOBUF_HASH=6973c3a5041636c1d8dc5f7f6c8c1f3c15bc63d6
 
-ENV CFLAGS '-fPIC -O2 -g'
-ENV CXXFLAGS '-fPIC -O2 -g'
-ENV LDFLAGS '-static-libstdc++'
+ENV CFLAGS='-fPIC -O2 -g'
+ENV CXXFLAGS='-fPIC -O2 -g'
+ENV LDFLAGS='-static-libstdc++'
 
 RUN echo "\e[32mbuilding: Udev\e[39m" \
     && set -ex \
@@ -230,9 +231,9 @@ ARG PROJECT_URL=https://github.com/monero-project/monero.git
 ARG BRANCH=master
 ARG BUILD_PATH=/monero.git/build/release/bin
 
-ENV CFLAGS '-fPIC -O1'
-ENV CXXFLAGS '-fPIC -O1'
-ENV LDFLAGS '-static-libstdc++'
+ENV CFLAGS='-fPIC -O1'
+ENV CXXFLAGS='-fPIC -O1'
+ENV LDFLAGS='-static-libstdc++'
 
 # COPY patch.diff /data
 
@@ -277,7 +278,7 @@ RUN echo "\e[32mcloning: $PROJECT_URL on branch: $BRANCH\e[39m" \
     && apt-get clean > /dev/null \
     && rm -rf /var/tmp/* /tmp/* /var/lib/apt/* > /dev/null
 
-FROM debian:stable-slim
+FROM debian:${DEBIAN_VERSION}
 COPY --from=builder /data/monerod /usr/local/bin/
 COPY --from=builder /data/monero-wallet-rpc /usr/local/bin/
 COPY --from=builder /data/monero-wallet-cli /usr/local/bin/
