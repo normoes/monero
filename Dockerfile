@@ -6,6 +6,7 @@ WORKDIR /data
 #su-exec
 ARG SUEXEC_VERSION=v0.2
 ARG SUEXEC_HASH=f85e5bde1afef399021fbc2a99c837cf851ceafa
+
 #Cmake
 ARG CMAKE_VERSION=3.14.6
 ARG CMAKE_VERSION_DOT=v3.14
@@ -238,7 +239,7 @@ ENV LDFLAGS='-static-libstdc++'
 # COPY patch.diff /data
 
 RUN echo "\e[32mcloning: $PROJECT_URL on branch: $BRANCH\e[39m" \
-    && git clone --branch "$BRANCH" --single-branch --recursive $PROJECT_URL monero.git > /dev/null \
+    && git clone --branch "$BRANCH" --single-branch --depth 1 --recursive $PROJECT_URL monero.git > /dev/null \
     && cd monero.git || exit 1 \
     # && echo "\e[32mapplying version patch\e[39m" \
     # && git apply --stat ../patch.diff \
