@@ -18,4 +18,7 @@ MOST_RECENT_TAG=$(curl -s https://api.github.com/repos/monero-project/monero/tag
 if [ "$MOST_RECENT_TAG" = "$DOCKER_TAG" ]; then
   docker tag $IMAGE_NAME $DOCKER_REPO:most_recent_tag
   docker push $DOCKER_REPO:most_recent_tag
+elif [ "$SOURCE_BRANCH" = "most_recent_tag" ]; then
+  docker tag $IMAGE_NAME $DOCKER_REPO:$MOST_RECENT_TAG
+  docker push $DOCKER_REPO:$MOST_RECENT_TAG
 fi

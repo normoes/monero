@@ -4,6 +4,15 @@
 # * monero branch/tag to clone
 # * docker image tag to push
 
+env
+
+if [ "$SOURCE_BRANCH" = "most_recent_tag" ]; then
+    MOST_RECENT_TAG=$(curl -s https://api.github.com/repos/monero-project/monero/tags | grep -i name | awk 'NR==1{print $2}' | tr -d "\",")
+    export SOURCE_BRANCH="$MOST_RECENT_TAG"
+fi
+
+env
+
 docker pull $DOCKER_REPO:dependencies1 || true
 
 docker build \
