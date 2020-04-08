@@ -7,6 +7,7 @@ services:
       dockerfile: Dockerfile
       args:
         BRANCH: master
+        DEBIAN_VERSION: "stable-20200130-slim"
     command: monero-wallet-rpc --testnet --wallet-file wallet --password-file wallet.passwd --disable-rpc-login
     volumes:
       - <path/to/and/including/wallet_folder>:/monero

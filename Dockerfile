@@ -77,8 +77,9 @@ WORKDIR /data
 ENV BASE_DIR /usr/local
 
 # OpenSSL
-ARG OPENSSL_VERSION=1.1.1b
-ARG OPENSSL_HASH=5c557b023230413dfb0756f3137a13e6d726838ccd1430888ad15bfb2b43ea4b
+ARG OPENSSL_VERSION=1.1.1
+ARG OPENSSL_FIX=f
+ARG OPENSSL_HASH=186c6bfe6ecfba7a5b48c47f8a1673d0f3b0e5ba2e25602dd23b629975da3f35
 # ZMQ
 ARG ZMQ_VERSION=v4.3.2
 ARG ZMQ_HASH=a84ffa12b2eb3569ced199660bac5ad128bff1f0
@@ -98,17 +99,18 @@ ENV LDFLAGS='-static-libstdc++'
 
 RUN echo "\e[32mbuilding: Openssl\e[39m" \
     && set -ex \
-    && curl -s -O https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz > /dev/null \
-    && echo "${OPENSSL_HASH}  openssl-${OPENSSL_VERSION}.tar.gz" | sha256sum -c \
-    && tar -xzf openssl-${OPENSSL_VERSION}.tar.gz > /dev/null \
-    && cd openssl-${OPENSSL_VERSION} || exit 1 \
+    && curl -s -O https://www.openssl.org/source/openssl-${OPENSSL_VERSION}${OPENSSL_FIX}.tar.gz > /dev/null \
+    # && curl -s -O https://www.openssl.org/source/old/${OPENSSL_VERSION}/openssl-${OPENSSL_VERSION}${OPENSSL_FIX}.tar.gz > /dev/null \
+    && echo "${OPENSSL_HASH}  openssl-${OPENSSL_VERSION}${OPENSSL_FIX}.tar.gz" | sha256sum -c \
+    && tar -xzf openssl-${OPENSSL_VERSION}${OPENSSL_FIX}.tar.gz > /dev/null \
+    && cd openssl-${OPENSSL_VERSION}${OPENSSL_FIX} || exit 1 \
     && ./Configure --prefix=$BASE_DIR linux-x86_64 no-shared --static "$CFLAGS" > /dev/null \
     && make build_generated > /dev/null \
     && make libcrypto.a > /dev/null \
     && make install > /dev/null \
     && cd /data || exit 1 \
-    && rm -rf /data/openssl-${OPENSSL_VERSION} \
-    && rm -rf /data/openssl-${OPENSSL_VERSION}.tar.gz \
+    && rm -rf /data/openssl-${OPENSSL_VERSION}${OPENSSL_FIX} \
+    && rm -rf /data/openssl-${OPENSSL_VERSION}${OPENSSL_FIX}.tar.gz \
     && echo "\e[32mbuilding: ZMQ\e[39m" \
     && set -ex \
     && git clone --branch ${ZMQ_VERSION} --single-branch --depth 1 https://github.com/zeromq/libzmq.git > /dev/null \
@@ -241,7 +243,7 @@ ENV LDFLAGS='-static-libstdc++'
 RUN echo "\e[32mcloning: $PROJECT_URL on branch: $BRANCH\e[39m" \
     && git clone --branch "$BRANCH" --single-branch --depth 1 --recursive $PROJECT_URL monero.git > /dev/null \
     && cd monero.git || exit 1 \
-    # && echo "\e[32mapplying version patch\e[39m" \
+    # && echo "\e[32mapplying  patch\e[39m" \
     # && git apply --stat ../patch.diff \
     # && git apply --check ../patch.diff \
     # && git apply  ../patch.diff \
