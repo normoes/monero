@@ -10,12 +10,17 @@ if [ -n "$RPC_USER" -a -n "$RPC_PASSWD" ]; then
   RPC_LOGIN="--rpc-login $RPC_USER:$RPC_PASSWD"
 fi
 
+# daemon login options
+if [ -n "$DAEMON_USER" -a -n "$DAEMON_PASSWD" ]; then
+  DAEMON_LOGIN="--daemon-login $DAEMON_USER:$DAEMON_PASSWD"
+fi
+
 if [ -n "$WALLET_PASSWD" ]; then
   WALLET_ACCESS="--password $WALLET_PASSWD"
 fi
 
 # used for monerod and monero-wallet-rpc
-RPC_OPTIONS="$LOGGING $RPC_LOGIN --confirm-external-bind --rpc-bind-ip $RPC_BIND_IP --rpc-bind-port $RPC_BIND_PORT"
+RPC_OPTIONS="$LOGGING $RPC_LOGIN --confirm-external-bind --non-interactive --rpc-bind-ip $RPC_BIND_IP --rpc-bind-port $RPC_BIND_PORT"
 # used for monerod
 MONEROD_OPTIONS="--p2p-bind-ip $P2P_BIND_IP --p2p-bind-port $P2P_BIND_PORT"
 
@@ -24,7 +29,7 @@ MONEROD="monerod $@ $RPC_OPTIONS $MONEROD_OPTIONS --check-updates disabled"
 if [[ "${1:0:1}" = '-' ]]  || [[ -z "$@" ]]; then
   set -- $MONEROD
 elif [[ "$1" = monero-wallet-rpc* ]]; then
-  set -- "$@ $WALLET_ACCESS $DAEMON_OPTIONS $RPC_OPTIONS"
+  set -- "$@ $WALLET_ACCESS $DAEMON_LOGIN $DAEMON_OPTIONS $RPC_OPTIONS"
 elif [[ "$1" = monero-wallet-cli* ]]; then
   set -- "$@ $WALLET_ACCESS $DAEMON_OPTIONS $LOGGING"
 fi

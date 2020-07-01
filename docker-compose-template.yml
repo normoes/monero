@@ -6,9 +6,9 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        BRANCH: v0.15.0.5
+        BRANCH: v0.16.0.1
         DEBIAN_VERSION: "stable-20200130-slim"
-    command: --testnet --data-dir /monero --non-interactive
+    command: --testnet --data-dir /monero
     volumes:
       # /monero in container should eventually contain the contents of the folder .bitmonero
       - <path/to/and/including/.bitmonero>:/monero
