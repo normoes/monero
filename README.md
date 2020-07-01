@@ -124,7 +124,7 @@ Without any additional command
 Any additional `monerod` parameters can be passed as command:
 
 ```
-docker run --rm -d -p 18081:18081 -v <path/to/and/including/.bitmonero>:/monero xmrto/monero --data-dir /monero --non-interactive
+docker run --rm -d -p 18081:18081 -v <path/to/and/including/.bitmonero>:/monero xmrto/monero --data-dir /monero
 ```
 
 ### user
