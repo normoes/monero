@@ -1,6 +1,11 @@
 ARG DEBIAN_VERSION="${DEBIAN_VERSION:-stable-slim}"
 FROM debian:${DEBIAN_VERSION} as dependencies1
 
+LABEL author="norman.moeschter@gmail.com" \
+      maintainer="norman.moeschter@gmail.com" \
+      version="v1.0.0" \
+      update="2020-08-05"
+
 WORKDIR /data
 
 #su-exec
