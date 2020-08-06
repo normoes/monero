@@ -41,6 +41,7 @@ RUN apt-get update -qq && apt-get --no-install-recommends -yqq install \
         automake \
         bzip2 \
         xsltproc \
+        docbook-xsl \
         gperf \
         unzip > /dev/null \
     && cd /data || exit 1 \
@@ -189,7 +190,7 @@ RUN echo "\e[32mbuilding: Udev\e[39m" \
     && cd eudev || exit 1 \
     && test `git rev-parse HEAD` = ${UDEV_HASH} || exit 1 \
     && ./autogen.sh \
-    && ./configure --prefix=$BASE_DIR --disable-gudev --disable-introspection --disable-hwdb --disable-manpages --disable-shared > /dev/null \
+    && ./configure --prefix=$BASE_DIR --disable-gudev --disable-gtk-doc-html --disable-keymap --disable-introspection --disable-hwdb --disable-manpages --disable-shared > /dev/null \
     && make > /dev/null \
     && make install > /dev/null \
     && cd /data || exit 1 \
@@ -279,6 +280,7 @@ RUN echo "\e[32mcloning: $PROJECT_URL on branch: $BRANCH\e[39m" \
         automake \
         bzip2 \
         xsltproc \
+        docbook-xsl \
         gperf \
         unzip \
         libreadline-dev > /dev/null \
