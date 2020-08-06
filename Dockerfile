@@ -190,7 +190,7 @@ RUN echo "\e[32mbuilding: Udev\e[39m" \
     && cd eudev || exit 1 \
     && test `git rev-parse HEAD` = ${UDEV_HASH} || exit 1 \
     && ./autogen.sh \
-    && ./configure --prefix=$BASE_DIR --disable-gudev --disable-gtk-doc-html --disable-keymap --disable-introspection --disable-hwdb --disable-manpages --disable-shared > /dev/null \
+    && ./configure --prefix=$BASE_DIR --disable-introspection --disable-hwdb --disable-manpages --disable-shared > /dev/null \
     && make > /dev/null \
     && make install > /dev/null \
     && cd /data || exit 1 \
