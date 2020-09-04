@@ -7,6 +7,9 @@
 if [ "$SOURCE_BRANCH" = "most_recent_tag" ]; then
     MOST_RECENT_TAG=$(curl -s https://api.github.com/repos/monero-project/monero/tags | grep -i name | awk 'NR==1{print $2}' | tr -d "\",")
     export SOURCE_BRANCH="$MOST_RECENT_TAG"
+elif [ "$SOURCE_BRANCH" = "master" ]; then
+    MASTER_COMMIT_SHA=$(curl -s https://api.github.com/repos/monero-project/monero/branches/master  | grep -i sha | awk 'NR==1{print $2}' | tr -d "\",")
+    export BUILD_BRANCH="$MASTER_COMMIT_SHA"
 fi
 
 docker pull $DOCKER_REPO:dependencies1 || true
@@ -55,6 +58,7 @@ docker build \
   --cache-from $DOCKER_REPO:dependencies3 \
   --cache-from $DOCKER_REPO:builder \
   --build-arg BRANCH=$SOURCE_BRANCH \
+  --build-arg BUILD_BRANCH=$BUILD_BRANCH \
   -f ./Dockerfile \
   -t $DOCKER_REPO:builder .
 
@@ -69,5 +73,6 @@ docker build \
   --cache-from $DOCKER_REPO:builder \
   --cache-from $IMAGE_NAME \
   --build-arg BRANCH=$SOURCE_BRANCH \
+  --build-arg BUILD_BRANCH=$BUILD_BRANCH \
   -f ./Dockerfile \
   -t $IMAGE_NAME .

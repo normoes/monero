@@ -21,4 +21,8 @@ if [ "$MOST_RECENT_TAG" = "$DOCKER_TAG" ]; then
 elif [ "$SOURCE_BRANCH" = "most_recent_tag" ]; then
   docker tag $IMAGE_NAME $DOCKER_REPO:$MOST_RECENT_TAG
   docker push $DOCKER_REPO:$MOST_RECENT_TAG
+elif [ "$SOURCE_BRANCH" = "master" ]; then
+  MASTER_COMMIT_SHA=$(curl -s https://api.github.com/repos/monero-project/monero/branches/master  | grep -i sha | awk 'NR==1{print $2}' | tr -d "\",")
+  docker tag $IMAGE_NAME $DOCKER_REPO:"$MASTER_COMMIT_SHA"
+  docker push $DOCKER_REPO:"$MASTER_COMMIT_SHA"
 fi

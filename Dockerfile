@@ -3,8 +3,8 @@ FROM debian:${DEBIAN_VERSION} as dependencies1
 
 LABEL author="norman.moeschter@gmail.com" \
       maintainer="norman.moeschter@gmail.com" \
-      version="v1.0.0" \
-      update="2020-08-05"
+      version="v1.0.1" \
+      update="2020-09-05"
 
 WORKDIR /data
 
@@ -239,6 +239,7 @@ WORKDIR /data
 ARG PROJECT_URL=https://github.com/monero-project/monero.git
 ARG BRANCH=master
 ARG BUILD_PATH=/monero.git/build/release/bin
+ARG BUILD_BRANCH=$BRANCH
 
 ENV CFLAGS='-fPIC -O1'
 ENV CXXFLAGS='-fPIC -O1'
@@ -247,8 +248,12 @@ ENV LDFLAGS='-static-libstdc++'
 # COPY patch.diff /data
 
 RUN echo "\e[32mcloning: $PROJECT_URL on branch: $BRANCH\e[39m" \
-    && git clone --branch "$BRANCH" --single-branch --depth 1 --recursive $PROJECT_URL monero.git > /dev/null \
+    && git clone -n --branch "$BRANCH" --single-branch --depth 1 --recursive $PROJECT_URL monero.git > /dev/null \
     && cd monero.git || exit 1 \
+    echo "$BRANCH" \
+    echo "$BUILD_BRANCH" \
+    && git checkout "$BUILD_BRANCH" \
+    && git submodule update --init --force \
     # && echo "\e[32mapplying  patch\e[39m" \
     # && git apply --stat ../patch.diff \
     # && git apply --check ../patch.diff \
