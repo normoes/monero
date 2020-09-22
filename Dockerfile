@@ -250,8 +250,6 @@ ENV LDFLAGS='-static-libstdc++'
 RUN echo "\e[32mcloning: $PROJECT_URL on branch: $BRANCH\e[39m" \
     && git clone -n --branch "$BRANCH" --single-branch --depth 1 --recursive $PROJECT_URL monero.git > /dev/null \
     && cd monero.git || exit 1 \
-    echo "$BRANCH" \
-    echo "$BUILD_BRANCH" \
     && git checkout "$BUILD_BRANCH" \
     && git submodule update --init --force \
     # && echo "\e[32mapplying  patch\e[39m" \
