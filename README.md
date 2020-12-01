@@ -1,8 +1,8 @@
 ## Supported tags
 * `latest` (This is the most recent Monero `master` branch commit.)
-* `9fb2243db0dbf55580aa21240cbfbb1f6706cf2a` (This is a specific Monero `master` branch commit, specified by commit hash.)
+* `850edfe4199458314346e2910550b33663310f42` (This is a specific Monero `master` branch commit, specified by commit hash.)
 * `most_recent_tag` (This is the most recent Monero `tag`.)
-* `v0.16.0.3` (This is a specific Monero `tag`.)
+* `v0.17.1.5` (This is a specific Monero `tag`.)
 
 ---
 
@@ -10,7 +10,7 @@ For running `monerod` or `monero-wallet-rpc` or `monero-wallet-cli` in a docker 
 
 This daemon is built from source: [monero project](https://github.com/monero-project/monero).
 
-* Monero stable for `stagenet`/`mainnet`: Use version tags like `v0.16.0.3`.
+* Monero stable for `stagenet`/`mainnet`: Use version tags like `v0.17.1.5`.
 * `testnet`: Use the `master` tag.
   - Generally, it is recommended to use `master` branch when working on `testnet`.
   - Of course, `latest` can also be used with `mainnet` and `stagenet`.
@@ -59,6 +59,10 @@ This daemon is built from source: [monero project](https://github.com/monero-pro
   - `-e USE_TORSOCKS=YES` (**default**: `NO`)
 * Running the Tor proxy (`tor`) within the container:
   - `-e USE_TOR=YES` (**default**: `NO`)
+* Log files:
+  - The size of log files is limited to around `5.1 MB`.
+  - The number of log files is capped at `3`.
+  - By using `--max-log-file-size 5242880 --max-log-files 3` in the entrypoint script.
 
 ### hint:
 * The IPs, the daemon or RPC are binding to, need to be `0.0.0.0` instead of `127.0.0.1` within a docker container.
@@ -127,6 +131,20 @@ Any additional `monerod` parameters can be passed as command:
 ```
 docker run --rm -d -p 18081:18081 -v <path/to/and/including/.bitmonero>:/monero xmrto/monero --data-dir /monero
 ```
+
+Not specifying a host port in `-p <host_port>:<container_port>` docker will automatically assign a free port on the host.
+
+```
+docker run --rm -d -p 18081 -v <path/to/and/including/.bitmonero>:/monero xmrto/monero --data-dir /monero
+```
+
+However, this only works for the common Monero network ports:
+* `18080`
+* `18081`
+* `28080`
+* `28081`
+* `38080`
+* `38081`
 
 ### user
 Run `monerod` as different user (`uid != 1000 && uid != 0`). This is useful if deployed to several systems (AWS ec2-user: `uid=500`).
