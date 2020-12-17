@@ -3,8 +3,8 @@ FROM debian:${DEBIAN_VERSION} as dependencies1
 
 LABEL author="norman.moeschter@gmail.com" \
       maintainer="norman.moeschter@gmail.com" \
-      version="v1.0.1" \
-      update="2020-09-05"
+      version="v1.0.2" \
+      update="2020-12-17"
 
 WORKDIR /data
 
@@ -84,8 +84,8 @@ ENV BASE_DIR /usr/local
 
 # OpenSSL
 ARG OPENSSL_VERSION=1.1.1
-ARG OPENSSL_FIX=g
-ARG OPENSSL_HASH=ddb04774f1e32f0c49751e21b67216ac87852ceb056b75209af2443400636d46
+ARG OPENSSL_FIX=i
+ARG OPENSSL_HASH=e8be6a35fe41d10603c3cc635e93289ed00bf34b79671a3a4de64fcee00d5242
 # ZMQ
 ARG ZMQ_VERSION=v4.3.2
 ARG ZMQ_HASH=a84ffa12b2eb3569ced199660bac5ad128bff1f0
