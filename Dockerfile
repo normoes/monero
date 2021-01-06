@@ -1,11 +1,6 @@
 ARG DEBIAN_VERSION="${DEBIAN_VERSION:-stable-slim}"
 FROM debian:${DEBIAN_VERSION} as dependencies1
 
-LABEL author="norman.moeschter@gmail.com" \
-      maintainer="norman.moeschter@gmail.com" \
-      version="v1.0.2" \
-      update="2020-12-17"
-
 WORKDIR /data
 
 #su-exec
@@ -289,7 +284,7 @@ RUN echo "\e[32mcloning: $PROJECT_URL on branch: $BRANCH\e[39m" \
         libreadline-dev > /dev/null \
     && apt-get autoremove --purge -yqq > /dev/null \
     && apt-get clean > /dev/null \
-    && rm -rf /var/tmp/* /tmp/* /var/lib/apt/* > /dev/null
+    && rm -rf /var/tmp/* /tmp/* /var/lib/apt/* /var/cache/apt/* > /dev/null
 
 FROM debian:${DEBIAN_VERSION}
 COPY --from=builder /data/monerod /usr/local/bin/
@@ -302,7 +297,7 @@ RUN apt-get update -qq && apt-get install -yqq --no-install-recommends \
         tor > /dev/null \
     && apt-get autoremove --purge -yqq > /dev/null \
     && apt-get clean > /dev/null \
-    && rm -rf /var/tmp/* /tmp/* /var/lib/apt/* > /dev/null
+    && rm -rf /var/tmp/* /tmp/* /var/lib/apt/* /var/cache/apt/* > /dev/null
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
@@ -321,7 +316,13 @@ RUN monerod --version > /version.txt \
     && torsocks --version > /torsocks.txt \
     && tor --version > /tor.txt
 
+LABEL author="norman.moeschter@gmail.com" \
+      maintainer="norman.moeschter@gmail.com" \
+      version="v1.0.3" \
+      update="2021-01-06"
+
 VOLUME ["/monero"]
+VOLUME ["/data"]
 
 EXPOSE 18080
 EXPOSE 18081

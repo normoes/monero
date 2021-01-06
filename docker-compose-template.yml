@@ -6,12 +6,13 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        BRANCH: v0.16.0.1
-        DEBIAN_VERSION: "stable-20200130-slim"
-    command: --testnet --data-dir /monero
+        BRANCH: v0.17.1.8
+        DEBIAN_VERSION: "stable-20201209-slim"
+    command: --testnet --data-dir /monero --ban-list /data/block_tor.txt
     volumes:
       # /monero in container should eventually contain the contents of the folder .bitmonero
       - <path/to/and/including/.bitmonero>:/monero
+      - ${PWD}/block_tor.txt:/data/block_tor.txt
     ports:
       - "28080:28080"
       - "28081:28081"
