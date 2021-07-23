@@ -3,6 +3,7 @@ name: DockerHub Publish
 on:
   push:
     branches: [ master ]
+  workflow_dispatch:  # manual trigger (through website or api)
 
 env:
   IMAGE_NAME: melotools/monero
