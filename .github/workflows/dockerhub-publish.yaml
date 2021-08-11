@@ -6,7 +6,7 @@ on:
   workflow_dispatch:  # manual trigger (through website or api)
 
 env:
-  IMAGE_NAME: melotools/monero
+  IMAGE_NAME: normoes/monero
 
 
 jobs:
