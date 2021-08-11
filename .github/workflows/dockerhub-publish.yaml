@@ -2,7 +2,7 @@ name: DockerHub Publish
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, most_recent_tag ]
   workflow_dispatch:  # manual trigger (through website or api)
 
 env:
@@ -21,11 +21,27 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Get latest Monero tag
-        id: get_latest_monero_tag
-        run: echo "::set-output name=latest_tag::$(curl -s https://api.github.com/repos/monero-project/monero/tags | grep -i name | awk 'NR==1{print $2}' | tr -d "\",")"
+        run:  |
+          echo "BUILD_BRANCH=$(curl -s https://api.github.com/repos/monero-project/monero/tags | grep -i name | awk 'NR==1{print $2}' | tr -d "\",")" >> $GITHUB_ENV
+        if: github.ref == 'refs/heads/most_recent_tag'
+
+      - name: Set source branch when using Monero tag
+        run:  |
+          echo "CLONE_BRANCH=${{ env.BUILD_BRANCH }}" >> $GITHUB_ENV
+        if: github.ref == 'refs/heads/most_recent_tag'
+
+      - name: Get latest Monero master commit hash
+        run:  |
+          echo "BUILD_BRANCH=$(curl -s https://api.github.com/repos/monero-project/monero/branches/master  | grep -i sha | awk 'NR==1{print $2}' | tr -d "\",")" >> $GITHUB_ENV
+        if: github.ref == 'refs/heads/master'
+
+      - name: Set source branch when using master branch
+        run:  |
+          echo "CLONE_BRANCH=master" >> $GITHUB_ENV
+        if: github.ref == 'refs/heads/master'
 
       - name: Log into Dockerhub
-        uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
+        uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -82,8 +98,8 @@ jobs:
           --cache-from $IMAGE_NAME:dependencies2
           --cache-from $IMAGE_NAME:dependencies3
           --cache-from $IMAGE_NAME:builder
-          --build-arg BRANCH=${{ steps.get_latest_monero_tag.outputs.latest_tag }}
-          --build-arg BUILD_BRANCH=${{ steps.get_latest_monero_tag.outputs.latest_tag }}
+          --build-arg BRANCH=${{ env.CLONE_BRANCH }}
+          --build-arg BUILD_BRANCH=${{ env.BUILD_BRANCH }}
           -f ./Dockerfile
           -t $IMAGE_NAME:builder .
 
@@ -100,19 +116,26 @@ jobs:
           --cache-from $IMAGE_NAME:dependencies3
           --cache-from $IMAGE_NAME:builder
           --cache-from $IMAGE_NAME
-          --build-arg BRANCH=${{ steps.get_latest_monero_tag.outputs.latest_tag }}
-          --build-arg BUILD_BRANCH=${{ steps.get_latest_monero_tag.outputs.latest_tag }}
+          --build-arg BRANCH=${{ env.CLONE_BRANCH }}
+          --build-arg BUILD_BRANCH=${{ env.BUILD_BRANCH }}
           -f ./Dockerfile
-          -t $IMAGE_NAME:most_recent_tag .
+          -t $IMAGE_NAME .
 
-      - name: Tag the image with its Monero tag as well
-        run: docker tag $IMAGE_NAME:most_recent_tag $IMAGE_NAME:${{ steps.get_latest_monero_tag.outputs.latest_tag }}
+      - name: Tag the image with its Monero tag and/or master branch commit hash
+        run: docker tag $IMAGE_NAME $IMAGE_NAME:${{ env.BUILD_BRANCH }}
 
-      - name: Push the image tagged with its Monero tag as well
-        run: docker push $IMAGE_NAME:${{ steps.get_latest_monero_tag.outputs.latest_tag }}
+      - name: Push the image tagged with its Monero tag and/or master branch commit hash
+        run: docker push $IMAGE_NAME:${{ env.BUILD_BRANCH }}
 
-      - name: Tag the image as latest as well
-        run: docker tag $IMAGE_NAME:most_recent_tag $IMAGE_NAME:latest
+      - name: Tag the image with the most_recent_tag
+        run: docker tag $IMAGE_NAME $IMAGE_NAME:most_recent_tag
+        if: github.ref == 'refs/heads/most_recent_tag'
 
-      - name: Push the image tagged as latest as well
+      - name: Push the image tagged with the most recent monero project repo tag
+        run: docker push $IMAGE_NAME:most_recent_tag
+        if: github.ref == 'refs/heads/most_recent_tag'
+
+      - name: Push the latest image made from the most recent master commit
         run: docker push $IMAGE_NAME:latest
+        if: github.ref == 'refs/heads/master'
+
