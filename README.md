@@ -114,7 +114,7 @@ It is also possible to deactivate the entrpoint script.
 
 This way, it is possible to define and configure e.g. the `monero-wallet-rpc` yourself:
 ```
-docker run --rm -d --net host -v <path/to/and/including/wallet_folder>:/monero --entrypoint="" normoes/monero monero-wallet-rpc --log-level 2 --daemon-host node.xmr.to --daemon-port 18081 --confirm-external-bind --rpc-login user:passwd --rpc-bind-ip 0.0.0.0 --rpc-bind-port 18083 --wallet-file wallet --password-file wallet.passwd
+docker run --rm -d --net host -v <path/to/and/including/wallet_folder>:/monero --entrypoint="" normoes/monero monero-wallet-rpc --log-level 2 --daemon-host node.melo.tools --daemon-port 18081 --confirm-external-bind --rpc-login user:passwd --rpc-bind-ip 0.0.0.0 --rpc-bind-port 18083 --wallet-file wallet --password-file wallet.passwd
 ```
 
 ## monerod
@@ -164,12 +164,12 @@ When used as `monero-wallet-rpc` the full command is necessary as command to doc
 
 Passing the pasword as environment variable:
 ```
-docker run --rm -d --net host -e DAEMON_HOST=node.xmr.to -e DAEMON_PORT=18081 -e RPC_BIND_PORT=18083 -e RPC_USER=user -e RPC_PASSWD=passwd -e WALLET_PASSWD=securePasswd -v <path/to/and/including/wallet_folder>:/monero normoes/monero monero-wallet-rpc  --wallet-file wallet
+docker run --rm -d --net host -e DAEMON_HOST=node.melo.tools -e DAEMON_PORT=18081 -e RPC_BIND_PORT=18083 -e RPC_USER=user -e RPC_PASSWD=passwd -e WALLET_PASSWD=securePasswd -v <path/to/and/including/wallet_folder>:/monero normoes/monero monero-wallet-rpc  --wallet-file wallet
 ```
 
 Using a password file:
 ```
-docker run --rm -d --net host -e DAEMON_HOST=node.xmr.to -e DAEMON_PORT=18081 -e RPC_BIND_PORT=18083 -e RPC_USER=user -e RPC_PASSWD=passwd -v <path/to/and/including/wallet_folder>:/monero normoes/monero monero-wallet-rpc  --wallet-file wallet --password-file wallet.passwd
+docker run --rm -d --net host -e DAEMON_HOST=node.melo.tools -e DAEMON_PORT=18081 -e RPC_BIND_PORT=18083 -e RPC_USER=user -e RPC_PASSWD=passwd -v <path/to/and/including/wallet_folder>:/monero normoes/monero monero-wallet-rpc  --wallet-file wallet --password-file wallet.passwd
 ```
 
 ### user
@@ -178,7 +178,7 @@ Run `monero-wallet-rpc` as different user (`uid != 1000 && uid != 0`). This is u
 Abbreviated command:
 
 ```
-docker run --rm -d --net host -e DAEMON_HOST=node.xmr.to -e DAEMON_PORT=18081 -e RPC_BIND_PORT=18083 -e USER_ID=500 -v <host>:<container> normoes/monero monero-wallet-rpc <options>
+docker run --rm -d --net host -e DAEMON_HOST=node.melo.tools -e DAEMON_PORT=18081 -e RPC_BIND_PORT=18083 -e USER_ID=500 -v <host>:<container> normoes/monero monero-wallet-rpc <options>
 ```
 
 ### rpc
@@ -194,7 +194,7 @@ The path `/monero` is supposed to contain the actual wallet files. So when mount
 When used as `monero-wallet-cli` the full command is necessary as command to docker run:
 
 ```
-docker run --rm -it -e DAEMON_HOST=node.xmr.to -e DAEMON_PORT=18081 -v <path/to/and/including/wallet_folder>:/monero --net host normoes/monero monero-wallet-cli --wallet-file wallet --password-file wallet.passwd
+docker run --rm -it -e DAEMON_HOST=node.melo.tools -e DAEMON_PORT=18081 -v <path/to/and/including/wallet_folder>:/monero --net host normoes/monero monero-wallet-cli --wallet-file wallet --password-file wallet.passwd
 ```
 
 Due to `-it` (interactive terminal), you will end up within the container and can use the `monero-wallet-cli` commands.
@@ -205,7 +205,7 @@ Run `monero-wallet-cli` as different user (`uid != 1000 && uid != 0`). This is u
 Abbreviated command:
 
 ```
-docker run --rm -it --net host -e DAEMON_HOST=node.xmr.to -e DAEMON_PORT=18081 -e USER_ID=500 -v <host>:<container> normoes/monero monero-wallet-cli <options>
+docker run --rm -it --net host -e DAEMON_HOST=node.melo.tools -e DAEMON_PORT=18081 -e USER_ID=500 -v <host>:<container> normoes/monero monero-wallet-cli <options>
 ```
 
 ### hint

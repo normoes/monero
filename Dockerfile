@@ -62,7 +62,7 @@ RUN apt-get update -qq && apt-get --no-install-recommends -yqq install \
     && rm -rf /data/cmake-${CMAKE_VERSION}.tar.gz \
     && echo "\e[32mbuilding: Boost\e[39m" \
     && set -ex \
-    && curl -s -L -o  boost_${BOOST_VERSION}.tar.bz2 https://dl.bintray.com/boostorg/release/${BOOST_VERSION_DOT}/source/boost_${BOOST_VERSION}.tar.bz2 > /dev/null \
+    && curl -s -L -o  boost_${BOOST_VERSION}.tar.bz2 https://boostorg.jfrog.io/artifactory/main/release/${BOOST_VERSION_DOT}/source/boost_${BOOST_VERSION}.tar.bz2 > /dev/null \
     && echo "${BOOST_HASH}  boost_${BOOST_VERSION}.tar.bz2" | sha256sum -c \
     && tar -xvf boost_${BOOST_VERSION}.tar.bz2 > /dev/null \
     && cd boost_${BOOST_VERSION} || exit 1 \
@@ -72,7 +72,7 @@ RUN apt-get update -qq && apt-get --no-install-recommends -yqq install \
     && rm -rf /data/boost_${BOOST_VERSION} \
     && rm -rf /data/boost_${BOOST_VERSION}.tar.bz2
 
-FROM index.docker.io/xmrto/monero:dependencies1 as dependencies2
+FROM index.docker.io/normoes/monero:dependencies1 as dependencies2
 WORKDIR /data
 
 ENV BASE_DIR /usr/local
@@ -157,7 +157,7 @@ RUN echo "\e[32mbuilding: Openssl\e[39m" \
     && cd /data || exit 1 \
     && rm -rf /data/libsodium
 
-FROM index.docker.io/xmrto/monero:dependencies2 as dependencies3
+FROM index.docker.io/normoes/monero:dependencies2 as dependencies3
 WORKDIR /data
 
 ENV BASE_DIR /usr/local
@@ -226,7 +226,7 @@ RUN echo "\e[32mbuilding: Udev\e[39m" \
     && cd /data || exit 1 \
     && rm -rf /data/protobuf
 
-FROM index.docker.io/xmrto/monero:dependencies3 as builder
+FROM index.docker.io/normoes/monero:dependencies3 as builder
 WORKDIR /data
 # BUILD_PATH:
 # Using 'USE_SINGLE_BUILDDIR=1 make' creates a unified build dir (/monero.git/build/release/bin)
