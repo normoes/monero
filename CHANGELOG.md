@@ -1,4 +1,7 @@
-# 06.01.2021
+## 2021-08-14
+* Added github actions to keep on building docker images.
+
+# 2021-01-06
 - Dockerfile version `v1.0.3`.
 - Update on network attacks with `v0.17.1.8`.
     + https://www.reddit.com/r/Monero/comments/ko3d1n/third_update_on_the_ongoing_network_attacks/
@@ -7,6 +10,6 @@
     + Add `--ban-list block_tor.txt` as daemon startup flag.
 - Clean `apt-get` cache.
 
-# 17.12.2020
+# 2020-12-17
 - Dockerfile version `v1.0.2`.
 - Upgrade `openssl` to `1.1.1i`.
