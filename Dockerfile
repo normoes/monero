@@ -50,7 +50,7 @@ RUN apt-get update -qq && apt-get --no-install-recommends -yqq install \
     && rm -rf /data/su-exec.git \
     && echo "\e[32mbuilding: Cmake\e[39m" \
     && set -ex \
-    && curl -s -O https://cmake.org/files/${CMAKE_VERSION_DOT}/cmake-${CMAKE_VERSION}.tar.gz > /dev/null \
+    && curl -sSL -O https://cmake.org/files/${CMAKE_VERSION_DOT}/cmake-${CMAKE_VERSION}.tar.gz > /dev/null \
     && echo "${CMAKE_HASH}  cmake-${CMAKE_VERSION}.tar.gz" | sha256sum -c \
     && tar -xzf cmake-${CMAKE_VERSION}.tar.gz > /dev/null \
     && cd cmake-${CMAKE_VERSION} || exit 1 \
@@ -62,7 +62,7 @@ RUN apt-get update -qq && apt-get --no-install-recommends -yqq install \
     && rm -rf /data/cmake-${CMAKE_VERSION}.tar.gz \
     && echo "\e[32mbuilding: Boost\e[39m" \
     && set -ex \
-    && curl -s -L -o  boost_${BOOST_VERSION}.tar.bz2 https://boostorg.jfrog.io/artifactory/main/release/${BOOST_VERSION_DOT}/source/boost_${BOOST_VERSION}.tar.bz2 > /dev/null \
+    && curl -sSL -O https://boostorg.jfrog.io/artifactory/main/release/${BOOST_VERSION_DOT}/source/boost_${BOOST_VERSION}.tar.bz2 > /dev/null \
     && echo "${BOOST_HASH}  boost_${BOOST_VERSION}.tar.bz2" | sha256sum -c \
     && tar -xvf boost_${BOOST_VERSION}.tar.bz2 > /dev/null \
     && cd boost_${BOOST_VERSION} || exit 1 \
@@ -70,7 +70,7 @@ RUN apt-get update -qq && apt-get --no-install-recommends -yqq install \
     && ./b2 -a install --prefix=$BASE_DIR --build-type=minimal link=static runtime-link=static --with-chrono --with-date_time --with-filesystem --with-program_options --with-regex --with-serialization --with-system --with-thread --with-locale threading=multi threadapi=pthread cflags="$CFLAGS" cxxflags="$CXXFLAGS" stage > /dev/null \
     && cd /data || exit 1 \
     && rm -rf /data/boost_${BOOST_VERSION} \
-    && rm -rf /data/boost_${BOOST_VERSION}.tar.bz2
+    && rm -rf /data/boost_${BOOST_VERSION}.tar.bz2 
 
 FROM index.docker.io/normoes/monero:dependencies1 as dependencies2
 WORKDIR /data
@@ -94,13 +94,22 @@ ARG READLINE_HASH=e339f51971478d369f8a053a330a190781acb9864cf4c541060f12078948e4
 ARG SODIUM_VERSION=1.0.18
 ARG SODIUM_HASH=4f5e89fa84ce1d178a6765b8b46f2b6f91216677
 
+ARG UNBOUND_VERSION=1.13.2
+# https://nlnetlabs.nl/downloads/unbound/
+ARG UNBOUND_HASH=0a13b547f3b92a026b5ebd0423f54c991e5718037fd9f72445817f6a040e1a83
+
+ARG EXPAT_VERSION=2.4.1
+ARG EXPAT_VERSION=R_2_4_1
+# Git commit
+ARG EXPAT_HASH=a28238bdeebc087071777001245df1876a11f5ee
+
 ENV CFLAGS='-fPIC -O2 -g'
 ENV CXXFLAGS='-fPIC -O2 -g'
 ENV LDFLAGS='-static-libstdc++'
 
 RUN echo "\e[32mbuilding: Openssl\e[39m" \
     && set -ex \
-    && curl -s -O https://www.openssl.org/source/openssl-${OPENSSL_VERSION}${OPENSSL_FIX}.tar.gz > /dev/null \
+    && curl -sSl -O https://www.openssl.org/source/openssl-${OPENSSL_VERSION}${OPENSSL_FIX}.tar.gz > /dev/null \
     # && curl -s -O https://www.openssl.org/source/old/${OPENSSL_VERSION}/openssl-${OPENSSL_VERSION}${OPENSSL_FIX}.tar.gz > /dev/null \
     && echo "${OPENSSL_HASH}  openssl-${OPENSSL_VERSION}${OPENSSL_FIX}.tar.gz" | sha256sum -c \
     && tar -xzf openssl-${OPENSSL_VERSION}${OPENSSL_FIX}.tar.gz > /dev/null \
@@ -134,13 +143,13 @@ RUN echo "\e[32mbuilding: Openssl\e[39m" \
     && rm -rf /data/cppzmq \
     && echo "\e[32mbuilding: Readline\e[39m" \
     && set -ex \
-    && curl -s -O https://ftp.gnu.org/gnu/readline/readline-${READLINE_VERSION}.tar.gz > /dev/null \
+    && curl -sSL -O https://ftp.gnu.org/gnu/readline/readline-${READLINE_VERSION}.tar.gz > /dev/null \
     && echo "${READLINE_HASH}  readline-${READLINE_VERSION}.tar.gz" | sha256sum -c \
     && tar -xzf readline-${READLINE_VERSION}.tar.gz > /dev/null \
     && cd readline-${READLINE_VERSION} || exit 1 \
     && ./configure --prefix=$BASE_DIR > /dev/null \
     && make > /dev/null \
-    && make install > /dev/null \
+    && make install-static > /dev/null \
     && cd /data || exit 1 \
     && rm -rf /data/readline-${READLINE_VERSION} \
     && rm -rf readline-${READLINE_VERSION}.tar.gz \
@@ -150,12 +159,40 @@ RUN echo "\e[32mbuilding: Openssl\e[39m" \
     && cd libsodium || exit 1 \
     && test `git rev-parse HEAD` = ${SODIUM_HASH} || exit 1 \
     && ./autogen.sh \
-    && ./configure --prefix=$BASE_DIR > /dev/null \
+    && ./configure --prefix=$BASE_DIR --disable-shared > /dev/null \
     && make > /dev/null \
     && make check > /dev/null \
     && make install > /dev/null \
     && cd /data || exit 1 \
-    && rm -rf /data/libsodium
+    && rm -rf /data/libsodium \
+    && echo "\e[32mbuilding: libexpat\e[39m" \
+    && git clone --branch ${EXPAT_VERSION} --single-branch --depth 1 https://github.com/libexpat/libexpat.git expat.git > /dev/null \
+    && cd expat.git || exit 1 \
+    # && curl -sSL -O https://github.com/libexpat/libexpat/releases/download/R_2_4_1/expat-${EXPAT_VERSION}.tar.bz2 > /dev/null \
+    # && echo "${UNBOUND_HASH}  unbound-${UNBOUND_VERSION}.tar.gz" | sha256sum -c \
+    # && tar -xzf "unbound-${UNBOUND_VERSION}.tar.gz" \
+    && test `git rev-parse HEAD` = ${EXPAT_HASH} || exit 1 \
+    && cd expat || exit 1 \
+    && ./buildconf.sh \
+    && ./configure --prefix=$BASE_DIR \
+    && make \
+    && make install \
+    && cd /data || exit 1 \
+    && rm -rf /data/expat.git \
+    && echo "\e[32mbuilding: libunbound\e[39m" \
+    && curl -sSL -O https://nlnetlabs.nl/downloads/unbound/unbound-${UNBOUND_VERSION}.tar.gz > /dev/null \
+    && echo "${UNBOUND_HASH}  unbound-${UNBOUND_VERSION}.tar.gz" | sha256sum -c \
+    && tar -xzf "unbound-${UNBOUND_VERSION}.tar.gz" \
+    && cd unbound-${UNBOUND_VERSION} || exit 1 \
+    && ./configure --prefix=$BASE_DIR --enable-static-exe  \
+    && make \
+    && cd /data || exit 1 \
+    && cp /data/unbound-${UNBOUND_VERSION}/unbound.h /usr/local/include/ \
+    && cp /data/unbound-${UNBOUND_VERSION}/unbound /usr/local/bin/ \
+    && cp /data/unbound-${UNBOUND_VERSION}/.libs/libunbound.la /usr/local/lib/ \
+    && cp /data/unbound-${UNBOUND_VERSION}/.libs/libunbound.a /usr/local/lib/ \
+    && rm -rf /data/unbound-${UNBOUND_VERSION} \
+    && rm -rf /data/unbound-${UNBOUND_VERSION}.tar.gz
 
 FROM index.docker.io/normoes/monero:dependencies2 as dependencies3
 WORKDIR /data
@@ -239,6 +276,10 @@ ARG BUILD_BRANCH=$BRANCH
 ENV CFLAGS='-fPIC -O1'
 ENV CXXFLAGS='-fPIC -O1'
 ENV LDFLAGS='-static-libstdc++'
+# ENV LDFLAGS='-static-libstdc++ -L/usr/local/lib'
+# ENV LFLAGS='-llibunbound,-llibreadline'
+# ENV LDFLAGS='-static-libstdc++,-L/usr/local'
+# ENV CPPFLAGS='-I/usr/local/include'
 
 # COPY patch.diff /data
 

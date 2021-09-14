@@ -73,10 +73,10 @@ jobs:
       - name: Pull "dependencies1" if it exists
         run: docker pull $IMAGE_NAME:dependencies1 || true
 
-      #     --cache-from $IMAGE_NAME:dependencies1
       - name: Build updated "dependencies1" if necessary
         run: docker build --pull
           --target dependencies1
+          --cache-from $IMAGE_NAME:dependencies1
           -f ./Dockerfile
           -t $IMAGE_NAME:dependencies1 .
 
