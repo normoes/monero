@@ -1,6 +1,10 @@
 ## 2021-08-14
 * Added github actions to keep on building docker images.
 
+# 2022-02-24
+* Force new commit and by adding this comment.
+    - Re-enable github actions.
+
 # 2021-01-06
 - Dockerfile version `v1.0.3`.
 - Update on network attacks with `v0.17.1.8`.
