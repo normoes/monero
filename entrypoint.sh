@@ -1,5 +1,15 @@
 #!/bin/bash
 
+echo -e "\e[32mDocker image build information\e[39m"
+echo "  * Monero version:"
+echo "      $(cat /version.txt)"
+echo "  * Based on git commit hash:"
+echo "      $(cat /monero_git_commit.hash)"
+echo "  * SHA256 over all the files under src/ in the github repository:"
+echo "      $(cat /entire_src_files.sha256)"
+echo ""
+
+
 # allow 3 files with 5MB each
 LOGGING="--log-level $LOG_LEVEL --max-log-file-size 5242880 --max-log-files 3"
 

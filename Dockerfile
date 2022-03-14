@@ -288,6 +288,10 @@ RUN echo "\e[32mcloning: $PROJECT_URL on branch: $BRANCH\e[39m" \
     && cd monero.git || exit 1 \
     && git checkout "$BUILD_BRANCH" \
     && git submodule update --init --force \
+    && echo "\e[32mcreating hash of source\e[39m" \
+    && git log --format=%H | head -1 > /monero_git_commit.hash \
+    && sha256sum $(find ./src -type f) > /single_src_files.sha256 \
+    && cat /single_src_files.sha256 | awk '{print $1}' | sort -n -u | sha256sum | cut -d " " -f 1 > /entire_src_files.sha256 \
     # && echo "\e[32mapplying  patch\e[39m" \
     # && git apply --stat ../patch.diff \
     # && git apply --check ../patch.diff \
@@ -332,6 +336,9 @@ COPY --from=builder /data/monerod /usr/local/bin/
 COPY --from=builder /data/monero-wallet-rpc /usr/local/bin/
 COPY --from=builder /data/monero-wallet-cli /usr/local/bin/
 COPY --from=builder /data/su-exec /usr/local/bin/
+COPY --from=builder /monero_git_commit.hash /monero_git_commit.hash
+COPY --from=builder /single_src_files.sha256 /single_src_files.sha256
+COPY --from=builder /entire_src_files.sha256 /entire_src_files.sha256
 
 RUN apt-get update -qq && apt-get install -yqq --no-install-recommends \
         torsocks \
@@ -359,8 +366,8 @@ RUN monerod --version > /version.txt \
 
 LABEL author="norman.moeschter@gmail.com" \
       maintainer="norman.moeschter@gmail.com" \
-      version="v1.0.3" \
-      update="2021-01-06"
+      version="v1.1.0" \
+      update="2022-03-11"
 
 VOLUME ["/monero"]
 VOLUME ["/data"]

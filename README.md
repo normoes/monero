@@ -1,16 +1,27 @@
 ## Supported tags
 * `latest` (This is the most recent Monero `master` branch commit.)
-* `850edfe4199458314346e2910550b33663310f42` (This is a specific Monero `master` branch commit, specified by commit hash.)
+* `d562deaaa950979b7a31a441a8f02a00013e26d6` (This is a specific Monero `master` branch commit, specified by commit hash.)
 * `most_recent_tag` (This is the most recent Monero `tag`.)
-* `v0.17.1.8` (This is a specific Monero `tag`.)
+* `v0.17.3.0` (This is a specific Monero `tag`.)
 
 ---
 
 For running `monerod` or `monero-wallet-rpc` or `monero-wallet-cli` in a docker container.
 
-This daemon is built from source: [monero project](https://github.com/monero-project/monero).
+The binaries are built from source: [monero project](https://github.com/monero-project/monero).
 
-* Monero stable for `stagenet`/`mainnet`: Use version tags like `v0.17.1.5`.
+In the image you will find special files that should make sure the contained binaries contain a version not tempered with (see `Dockerfile`):
+* `/monero_git_commit.hash`
+    - The git commit hash this build is based on.
+* `/single_src_files.sha256`
+    - SHA256 hash of every single file.
+    - `sha256sum $(find ./src -type f)`
+* `/entire_src_files.sha256`
+    - A single SHA256 hash over all the hashes found in `/single_src_files.sha256`.
+    - `cat /single_src_files.sha256 | awk '{print $1}' | sort -n -u | sha256sum | cut -d " " -f 1`
+
+
+* Monero stable for `stagenet`/`mainnet`: Use version tags like `v0.17.3.0`.
 * `testnet`: Use the `master` tag.
   - Generally, it is recommended to use `master` branch when working on `testnet`.
   - Of course, `latest` can also be used with `mainnet` and `stagenet`.
