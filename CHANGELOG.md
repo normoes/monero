@@ -4,6 +4,7 @@
 # 2022-03-27
 * Improved `monero` build steps.
     - Inspired by: https://github.com/WeebDataHoarder/p2pool-compose/blob/master/docker/monero/Dockerfile
+    - Reverted back again, because it caused `Illegal instruction` when started.
 
 # 2022-03-14
 - Dockerfile version `v1.1.0`.
