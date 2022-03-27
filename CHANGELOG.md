@@ -1,6 +1,10 @@
 ## 2021-08-14
 * Added github actions to keep on building docker images.
 
+# 2022-03-27
+* Improved `monero` build steps.
+    - Inspired by: https://github.com/WeebDataHoarder/p2pool-compose/blob/master/docker/monero/Dockerfile
+
 # 2022-03-14
 - Dockerfile version `v1.1.0`.
 * Added a way that hopefully enables users to verify the binaries within this docker image are based on the original source (github).

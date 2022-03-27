@@ -270,11 +270,12 @@ WORKDIR /data
 
 ARG PROJECT_URL=https://github.com/monero-project/monero.git
 ARG BRANCH=master
-ARG BUILD_PATH=/monero.git/build/release/bin
+ARG BUILD_PATH=/monero.git/build/bin
+# ARG BUILD_PATH=/monero.git/build/release/bin
 ARG BUILD_BRANCH=$BRANCH
 
-ENV CFLAGS='-fPIC -O1'
-ENV CXXFLAGS='-fPIC -O1'
+ENV CFLAGS='-fPIC -O1 -march=native -mtune=native'
+ENV CXXFLAGS='-fPIC -O1 -march=native -mtune=native'
 ENV LDFLAGS='-static-libstdc++'
 # ENV LDFLAGS='-static-libstdc++ -L/usr/local/lib'
 # ENV LFLAGS='-llibunbound,-llibreadline'
@@ -287,19 +288,25 @@ RUN echo "\e[32mcloning: $PROJECT_URL on branch: $BRANCH\e[39m" \
     && git clone -n --branch "$BRANCH" --single-branch --depth 1 --recursive $PROJECT_URL monero.git > /dev/null \
     && cd monero.git || exit 1 \
     && git checkout "$BUILD_BRANCH" \
-    && git submodule update --init --force \
-    && echo "\e[32mcreating hash of source\e[39m" \
-    && git log --format=%H | head -1 > /monero_git_commit.hash \
-    && sha256sum $(find ./src -type f) > /single_src_files.sha256 \
-    && cat /single_src_files.sha256 | awk '{print $1}' | sort -n -u | sha256sum | cut -d " " -f 1 > /entire_src_files.sha256 \
+    && git submodule update --init --force --recursive \
     # && echo "\e[32mapplying  patch\e[39m" \
     # && git apply --stat ../patch.diff \
     # && git apply --check ../patch.diff \
     # && git apply  ../patch.diff \
+    && echo "\e[32mcreating hash of source\e[39m" \
+    && git log --format=%H | head -1 > /monero_git_commit.hash \
+    && sha256sum $(find ./src -type f) > /single_src_files.sha256 \
+    && cat /single_src_files.sha256 | awk '{print $1}' | sort -u | sha256sum | cut -d " " -f 1 > /entire_src_files.sha256 \
     && echo "\e[32mbuilding static binaries\e[39m" \
     && apt-get update -qq && apt-get install -yqq --no-install-recommends \
         libreadline-dev \
-    && USE_SINGLE_BUILDDIR=1 make release-static > /dev/null \
+    && mkdir build && cd build || exit 1 \
+    # CFLAGS="-march=native -mtune=native -Ofast" CXXFLAGS="-march=native -mtune=native -Ofast" \
+    && cmake .. -D BUILD_DOCUMENTATION=OFF -D BUILD_DEBUG_UTILITIES=OFF -D BUILD_TESTS=OFF -D BUILD_GUI_DEPS=OFF -D STACK_TRACE=OFF \
+    -D STATIC=ON -D ARCH="native" -D CMAKE_BUILD_TYPE=Release \
+    # && cmake --build . --target daemon -- -j$(nproc) \
+    && cmake --build . -- -j$(nproc) \
+    # && USE_SINGLE_BUILDDIR=1 make release-static > /dev/null \
     && echo "\e[32mcopy and clean up\e[39m" \
     && mv /data$BUILD_PATH/monerod /data/ \
     && chmod +x /data/monerod \
@@ -366,18 +373,12 @@ RUN monerod --version > /version.txt \
 
 LABEL author="norman.moeschter@gmail.com" \
       maintainer="norman.moeschter@gmail.com" \
-      version="v1.1.0" \
-      update="2022-03-11"
+      version="v1.2.0" \
+      update="2022-03-27"
 
-VOLUME ["/monero"]
-VOLUME ["/data"]
+VOLUME ["/monero", "/data"]
 
-EXPOSE 18080
-EXPOSE 18081
-EXPOSE 28080
-EXPOSE 28081
-EXPOSE 38080
-EXPOSE 38081
+EXPOSE 18080 18081 28080 28081 38080 38081
 
 ENV USER_ID 1000
 ENV LOG_LEVEL 0
