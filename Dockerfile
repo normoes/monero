@@ -274,8 +274,10 @@ ARG BRANCH=master
 ARG BUILD_PATH=/monero.git/build/release/bin
 ARG BUILD_BRANCH=$BRANCH
 
-ENV CFLAGS='-fPIC -O1 -march=native -mtune=native'
-ENV CXXFLAGS='-fPIC -O1 -march=native -mtune=native'
+ENV CFLAGS='-fPIC -O1'
+ENV CXXFLAGS='-fPIC -O1'
+# ENV CFLAGS='-fPIC -O1 -march=native -mtune=native'
+# ENV CXXFLAGS='-fPIC -O1 -march=native -mtune=native'
 ENV LDFLAGS='-static-libstdc++'
 # ENV LDFLAGS='-static-libstdc++ -L/usr/local/lib'
 # ENV LFLAGS='-llibunbound,-llibreadline'
@@ -300,13 +302,13 @@ RUN echo "\e[32mcloning: $PROJECT_URL on branch: $BRANCH\e[39m" \
     && echo "\e[32mbuilding static binaries\e[39m" \
     && apt-get update -qq && apt-get install -yqq --no-install-recommends \
         libreadline-dev \
-    # && mkdir build && cd build || exit 1 \
-    # # CFLAGS="-march=native -mtune=native -Ofast" CXXFLAGS="-march=native -mtune=native -Ofast" \
-    # && cmake .. -D BUILD_DOCUMENTATION=OFF -D BUILD_DEBUG_UTILITIES=OFF -D BUILD_TESTS=OFF -D BUILD_GUI_DEPS=OFF -D STACK_TRACE=OFF \
-    # -D STATIC=ON -D ARCH="native" -D CMAKE_BUILD_TYPE=Release \
-    # # && cmake --build . --target daemon -- -j$(nproc) \
-    # && cmake --build . -- -j$(nproc) \
-    && USE_SINGLE_BUILDDIR=1 make release-static > /dev/null \
+    && mkdir build && cd build || exit 1 \
+    # CFLAGS="-march=native -mtune=native -Ofast" CXXFLAGS="-march=native -mtune=native -Ofast" \
+    && cmake .. -D BUILD_DOCUMENTATION=OFF -D BUILD_DEBUG_UTILITIES=OFF -D BUILD_TESTS=OFF -D BUILD_GUI_DEPS=OFF -D STACK_TRACE=OFF \
+    -D STATIC=ON -D ARCH="native" -D CMAKE_BUILD_TYPE=Release \
+    # && cmake --build . --target daemon -- -j$(nproc) \
+    && cmake --build . -- -j$(nproc) \
+    #&& USE_SINGLE_BUILDDIR=1 make release-static > /dev/null \
     && echo "\e[32mcopy and clean up\e[39m" \
     && mv /data$BUILD_PATH/monerod /data/ \
     && chmod +x /data/monerod \
