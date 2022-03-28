@@ -270,8 +270,8 @@ WORKDIR /data
 
 ARG PROJECT_URL=https://github.com/monero-project/monero.git
 ARG BRANCH=master
-# ARG BUILD_PATH=/monero.git/build/bin
-ARG BUILD_PATH=/monero.git/build/release/bin
+ARG BUILD_PATH=/monero.git/build/bin
+# ARG BUILD_PATH=/monero.git/build/release/bin
 ARG BUILD_BRANCH=$BRANCH
 
 ENV CFLAGS='-fPIC -O1'
