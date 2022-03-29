@@ -303,7 +303,8 @@ RUN echo "\e[32mcloning: $PROJECT_URL on branch: $BRANCH\e[39m" \
     # && mkdir build && cd build || exit 1 \
     # # CFLAGS="-march=native -mtune=native -Ofast" CXXFLAGS="-march=native -mtune=native -Ofast" \
     # && cmake .. -D BUILD_DOCUMENTATION=OFF -D BUILD_DEBUG_UTILITIES=OFF -D BUILD_TESTS=OFF -D BUILD_GUI_DEPS=OFF -D STACK_TRACE=OFF \
-    # -D STATIC=ON -D ARCH="native" -D CMAKE_BUILD_TYPE=Release \
+    # -D STATIC=ON -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE=release \
+    # # -D STATIC=ON -D ARCH="native" -D CMAKE_BUILD_TYPE=Release \
     # # && cmake --build . --target daemon -- -j$(nproc) \
     # && cmake --build . -- -j$(nproc) \
     && USE_SINGLE_BUILDDIR=1 make release-static > /dev/null \
