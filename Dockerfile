@@ -109,7 +109,7 @@ ENV LDFLAGS='-static-libstdc++'
 
 RUN echo "\e[32mbuilding: Openssl\e[39m" \
     && set -ex \
-    && curl -sSl -O https://www.openssl.org/source/openssl-${OPENSSL_VERSION}${OPENSSL_FIX}.tar.gz > /dev/null \
+    && curl -sSL -O https://www.openssl.org/source/openssl-${OPENSSL_VERSION}${OPENSSL_FIX}.tar.gz > /dev/null \
     # && curl -s -O https://www.openssl.org/source/old/${OPENSSL_VERSION}/openssl-${OPENSSL_VERSION}${OPENSSL_FIX}.tar.gz > /dev/null \
     && echo "${OPENSSL_HASH}  openssl-${OPENSSL_VERSION}${OPENSSL_FIX}.tar.gz" | sha256sum -c \
     && tar -xzf openssl-${OPENSSL_VERSION}${OPENSSL_FIX}.tar.gz > /dev/null \
@@ -300,14 +300,14 @@ RUN echo "\e[32mcloning: $PROJECT_URL on branch: $BRANCH\e[39m" \
     && echo "\e[32mbuilding static binaries\e[39m" \
     && apt-get update -qq && apt-get install -yqq --no-install-recommends \
         libreadline-dev \
-    # && mkdir build && cd build || exit 1 \
-    # # CFLAGS="-march=native -mtune=native -Ofast" CXXFLAGS="-march=native -mtune=native -Ofast" \
-    # && cmake .. -D BUILD_DOCUMENTATION=OFF -D BUILD_DEBUG_UTILITIES=OFF -D BUILD_TESTS=OFF -D BUILD_GUI_DEPS=OFF -D STACK_TRACE=OFF \
-    # -D STATIC=ON -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE=release \
-    # # -D STATIC=ON -D ARCH="native" -D CMAKE_BUILD_TYPE=Release \
-    # # && cmake --build . --target daemon -- -j$(nproc) \
-    # && cmake --build . -- -j$(nproc) \
-    && USE_SINGLE_BUILDDIR=1 make release-static > /dev/null \
+    && mkdir build && cd build || exit 1 \
+    # CFLAGS="-march=native -mtune=native -Ofast" CXXFLAGS="-march=native -mtune=native -Ofast" \
+    && cmake .. -D BUILD_DOCUMENTATION=OFF -D BUILD_DEBUG_UTILITIES=OFF -D BUILD_TESTS=OFF -D BUILD_GUI_DEPS=OFF -D STACK_TRACE=OFF \
+    -D STATIC=ON -D ARCH="x86-64" -D BUILD_64=ON -D CMAKE_BUILD_TYPE=release \
+    # -D STATIC=ON -D ARCH="native" -D CMAKE_BUILD_TYPE=Release \
+    # && cmake --build . --target daemon -- -j$(nproc) \
+    && cmake --build . -- -j$(nproc) \
+    # && USE_SINGLE_BUILDDIR=1 make release-static > /dev/null \
     && echo "\e[32mcopy and clean up\e[39m" \
     && mv /data$BUILD_PATH/monerod /data/ \
     && chmod +x /data/monerod \
