@@ -3,6 +3,8 @@ FROM debian:${DEBIAN_VERSION} as dependencies1
 
 WORKDIR /data
 
+ENV DEBIAN_FRONTEND=noninteractive
+
 #su-exec
 ARG SUEXEC_VERSION=v0.2
 ARG SUEXEC_HASH=f85e5bde1afef399021fbc2a99c837cf851ceafa
@@ -74,6 +76,8 @@ RUN apt-get update -qq && apt-get --no-install-recommends -yqq install \
 
 FROM index.docker.io/normoes/monero:dependencies1 as dependencies2
 WORKDIR /data
+
+ENV DEBIAN_FRONTEND=noninteractive
 
 ENV BASE_DIR /usr/local
 
@@ -197,6 +201,8 @@ RUN echo "\e[32mbuilding: Openssl\e[39m" \
 FROM index.docker.io/normoes/monero:dependencies2 as dependencies3
 WORKDIR /data
 
+ENV DEBIAN_FRONTEND=noninteractive
+
 ENV BASE_DIR /usr/local
 
 # Udev
@@ -264,6 +270,8 @@ RUN echo "\e[32mbuilding: Udev\e[39m" \
     && rm -rf /data/protobuf
 
 FROM index.docker.io/normoes/monero:dependencies3 as builder
+ENV DEBIAN_FRONTEND=noninteractive
+
 WORKDIR /data
 # BUILD_PATH:
 # Using 'USE_SINGLE_BUILDDIR=1 make' creates a unified build dir (/monero.git/build/release/bin)
@@ -337,7 +345,7 @@ RUN echo "\e[32mcloning: $PROJECT_URL on branch: $BRANCH\e[39m" \
         libreadline-dev > /dev/null \
     && apt-get autoremove --purge -yqq > /dev/null \
     && apt-get clean > /dev/null \
-    && rm -rf /var/tmp/* /tmp/* /var/lib/apt/* /var/cache/apt/* > /dev/null
+    && rm -rf /var/tmp/* /tmp/* /var/lib/apt/lists/* /var/cache/apt/* > /dev/null
 
 FROM debian:${DEBIAN_VERSION}
 COPY --from=builder /data/monerod /usr/local/bin/
@@ -348,12 +356,14 @@ COPY --from=builder /monero_git_commit.hash /monero_git_commit.hash
 COPY --from=builder /single_src_files.sha256 /single_src_files.sha256
 COPY --from=builder /entire_src_files.sha256 /entire_src_files.sha256
 
+ENV DEBIAN_FRONTEND=noninteractive
+
 RUN apt-get update -qq && apt-get install -yqq --no-install-recommends \
         torsocks \
         tor > /dev/null \
     && apt-get autoremove --purge -yqq > /dev/null \
     && apt-get clean > /dev/null \
-    && rm -rf /var/tmp/* /tmp/* /var/lib/apt/* /var/cache/apt/* > /dev/null
+    && rm -rf /var/tmp/* /tmp/* /var/lib/apt/lists/* /var/cache/apt/* > /dev/null
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
@@ -374,8 +384,8 @@ RUN monerod --version > /version.txt \
 
 LABEL author="norman.moeschter@gmail.com" \
       maintainer="norman.moeschter@gmail.com" \
-      version="v1.2.0" \
-      update="2022-03-27"
+      version="v1.3.0" \
+      update="2023-02-08"
 
 VOLUME ["/monero", "/data"]
 

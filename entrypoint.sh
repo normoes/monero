@@ -46,12 +46,13 @@ fi
 
 if [ "$USE_TOR" == "YES" ]; then
   chown -R debian-tor /var/lib/tor
+  chown -R debian-tor /var/log/tor
   # run as daemon
-  tor -f /etc/tor/torrc
+  /usr/bin/tor -f /etc/tor/torrc
 fi
 
 if [ "$USE_TORSOCKS" == "YES" ]; then
-  set -- "torsocks $@"
+  set -- "/usr/bin/torsocks $@"
 fi
 
 # allow the container to be started with `--user

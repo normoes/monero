@@ -16,6 +16,15 @@ services:
     ports:
       - "28080:28080"
       - "28081:28081"
+    stdin_open: true
+    tty: true
+    read_only: true
+    init: true
+    security_opt:
+      - no-new-privileges: true
+    tmpfs:
+      - /run/monero
+      - /var/lib/tor
     environment:
       - USER_ID=1000
       - P2P_BIND_IP=0.0.0.0
