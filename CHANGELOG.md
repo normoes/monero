@@ -1,5 +1,6 @@
-## 2021-08-14
-* Added github actions to keep on building docker images.
+# 2023-02-08
+- Dockerfile version `v1.3.0`.
+- Optimized `tor` permissions when starting docker container in `read_only` mode.
 
 # 2022-03-27
 * Improved `monero` build steps.
@@ -28,6 +29,9 @@
 # 2022-02-24
 * Force new commit and by adding this comment.
     - Re-enable github actions.
+
+# 2021-08-14
+* Added github actions to keep on building docker images.
 
 # 2021-01-06
 - Dockerfile version `v1.0.3`.
