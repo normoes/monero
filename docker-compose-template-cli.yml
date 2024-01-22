@@ -6,9 +6,11 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        BRANCH: master
-        DEBIAN_VERSION: "stable-20200130-slim"
-    command: monero-wallet-cli --testnet --wallet-file wallet --password-file wallet.passwd
+        BRANCH: v0.18.3.1
+        # BRANCH: master
+        DEBIAN_VERSION: "stable-slim"
+    # command: monero-wallet-cli --testnet --wallet-file wallet --password-file wallet.passwd
+    command: monero-wallet-cli --wallet-file wallet --password-file wallet.passwd
     volumes:
       - <path/to/and/including/wallet_folder>:/monero
     stdin_open: true

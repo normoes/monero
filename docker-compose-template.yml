@@ -6,8 +6,9 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        BRANCH: v0.17.1.8
-        DEBIAN_VERSION: "stable-20201209-slim"
+        BRANCH: v0.18.3.1
+        # BRANCH: master
+        DEBIAN_VERSION: "stable-slim"
     command: --testnet --data-dir /monero --ban-list /data/block_tor.txt
     volumes:
       # /monero in container should eventually contain the contents of the folder .bitmonero
