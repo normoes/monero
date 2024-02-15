@@ -1,4 +1,4 @@
-ARG DEBIAN_VERSION="${DEBIAN_VERSION:-stable-slim}"
+ARG DEBIAN_VERSION=stable-slim
 FROM debian:${DEBIAN_VERSION} as dependencies1
 
 WORKDIR /data
@@ -365,6 +365,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update -qq && apt-get install -yqq --no-install-recommends \
         torsocks \
         tor > /dev/null \
+        curl \
     && apt-get autoremove --purge -yqq > /dev/null \
     && apt-get clean > /dev/null \
     && rm -rf /var/tmp/* /tmp/* /var/lib/apt/lists/* /var/cache/apt/* > /dev/null
@@ -388,8 +389,8 @@ RUN monerod --version > /version.txt \
 
 LABEL author="norman.moeschter@gmail.com" \
       maintainer="norman.moeschter@gmail.com" \
-      version="v1.4.0" \
-      update="2024-01-22"
+      version="v1.4.1" \
+      update="2024-02-15"
 
 VOLUME ["/monero", "/data"]
 
